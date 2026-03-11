@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="br-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F5C542"/>
+      <stop offset="30%" stop-color="#4A90D9"/>
+      <stop offset="50%" stop-color="#FF9800"/>
+      <stop offset="70%" stop-color="#66BB6A"/>
+      <stop offset="100%" stop-color="#AB47BC"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="184" height="184" rx="18" fill="url(#br-bg)"/>
+  <!-- Everything together: star/burst -->
+  <polygon points="100,50 112,82 146,82 118,104 128,136 100,116 72,136 82,104 54,82 88,82" fill="#FFFFFF" opacity="0.85"/>
+  <circle cx="100" cy="100" r="14" fill="#FFFFFF" opacity="0.6"/>
+</svg>

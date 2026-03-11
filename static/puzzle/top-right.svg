@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="tr-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4DB6AC"/>
+      <stop offset="100%" stop-color="#00897B"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="184" height="184" rx="18" fill="url(#tr-bg)"/>
+  <!-- Timing/clock -->
+  <circle cx="100" cy="100" r="42" fill="none" stroke="#E0F2F1" stroke-width="4"/>
+  <circle cx="100" cy="100" r="4" fill="#E0F2F1"/>
+  <line x1="100" y1="100" x2="100" y2="70" stroke="#E0F2F1" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="100" y1="100" x2="122" y2="108" stroke="#E0F2F1" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Hour markers -->
+  <circle cx="100" cy="62" r="3" fill="#E0F2F1"/>
+  <circle cx="138" cy="100" r="3" fill="#E0F2F1"/>
+  <circle cx="100" cy="138" r="3" fill="#E0F2F1"/>
+  <circle cx="62" cy="100" r="3" fill="#E0F2F1"/>
+</svg>

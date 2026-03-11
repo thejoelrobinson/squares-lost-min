@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="ml-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#EC407A"/>
+      <stop offset="100%" stop-color="#C2185B"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="184" height="184" rx="18" fill="url(#ml-bg)"/>
+  <!-- Empathy/heart -->
+  <path d="M100 140 C60 110 40 80 60 65 C80 50 100 65 100 80 C100 65 120 50 140 65 C160 80 140 110 100 140Z" fill="#FCE4EC" opacity="0.9"/>
+</svg>

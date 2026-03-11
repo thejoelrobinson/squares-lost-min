@@ -1,0 +1,13 @@
+---
+part: 6
+title: "Being Specific"
+slug: "being-specific"
+---
+
+## Transcript
+
+This lesson tackles one of the most common feedback mistakes — being too vague. Jordan and Sam break down the difference between concrete observations and vague judgments, and why specificity is what makes feedback useful and actionable.
+
+They walk through examples like "you need to communicate better" versus "in the last two standups, you didn't mention the blockers your team was facing, which left the rest of us assuming everything was on track." The hosts explain how vague feedback often backfires because the recipient doesn't know what to change, while specific feedback gives them a clear picture and a path forward.
+
+*Full transcript coming soon.*

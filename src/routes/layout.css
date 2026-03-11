@@ -1,0 +1,20 @@
+@import 'tailwindcss';
+@import '$lib/theme/tokens.css';
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+@theme {
+  --color-primary: oklch(65% 0.24 275);
+  --color-primary-light: oklch(80% 0.16 275);
+  --color-secondary: oklch(72% 0.18 155);
+  --color-accent: oklch(78% 0.22 65);
+  --color-bg: oklch(98% 0.005 275);
+  --color-surface: oklch(100% 0 0);
+  --color-surface-raised: oklch(96% 0.01 275);
+  --color-text: oklch(25% 0.02 275);
+  --color-text-muted: oklch(55% 0.02 275);
+  --color-success: oklch(68% 0.19 155);
+  --color-error: oklch(62% 0.22 25);
+  --color-warning: oklch(78% 0.18 80);
+  --color-reward-glow: oklch(80% 0.22 65);
+}

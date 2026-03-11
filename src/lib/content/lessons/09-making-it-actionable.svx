@@ -1,0 +1,13 @@
+---
+part: 9
+title: "Making It Actionable"
+slug: "making-it-actionable"
+---
+
+## Transcript
+
+This lesson focuses on the bridge between feedback and change — turning observations into concrete next steps. Jordan and Sam discuss why feedback without a path forward often feels like criticism, and how to collaboratively create action items that the recipient actually owns.
+
+They cover techniques like asking "what would you do differently next time?" instead of prescribing solutions, co-creating development goals, and setting check-in points to revisit progress. The hosts also discuss how to make positive feedback actionable by helping people understand what they did well so they can replicate it intentionally rather than accidentally.
+
+*Full transcript coming soon.*
