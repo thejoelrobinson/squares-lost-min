@@ -1,14 +1,16 @@
 <script lang="ts">
 	import Button from '$lib/components/Button.svelte';
+	import SparkCoin from '$lib/components/SparkCoin.svelte';
+	import SoundEffects from '$lib/utils/soundEffects';
 
 	interface Props {
-		position: string;
 		earnedCount: number;
 		totalCount?: number;
+		coinImage?: string;
 		onContinue: () => void;
 	}
 
-	let { position, earnedCount, totalCount = 9, onContinue }: Props = $props();
+	let { earnedCount, totalCount = 9, coinImage, onContinue }: Props = $props();
 
 	let mounted = $state(false);
 
@@ -16,6 +18,8 @@
 		// Trigger mount animation on next frame
 		const id = requestAnimationFrame(() => {
 			mounted = true;
+			// Play reward sound when coin appears
+			SoundEffects.play('reward');
 		});
 		return () => cancelAnimationFrame(id);
 	});
@@ -23,18 +27,14 @@
 
 <div class="reward-overlay fixed inset-0 z-50 flex items-center justify-center bg-black/50">
 	<div class="reward-container bg-surface-raised mx-4 flex max-w-sm flex-col items-center gap-6 rounded-2xl p-8 text-center">
-		<h2 class="text-text text-xl font-bold">Piece earned!</h2>
+		<h2 class="text-text text-xl font-bold">Spark Point earned!</h2>
 
-		<div class="piece-wrapper" class:piece-visible={mounted}>
-			<img
-				src="/puzzle/{position}.svg"
-				alt="Puzzle piece: {position}"
-				class="h-40 w-40"
-			/>
+		<div class="coin-wrapper" class:coin-visible={mounted}>
+			<SparkCoin size={140} backImage={coinImage} />
 		</div>
 
 		<p class="text-text-muted text-sm">
-			{earnedCount} of {totalCount} pieces collected
+			{earnedCount} of {totalCount} Spark Points collected
 		</p>
 
 		<!-- Confetti dots -->
@@ -62,7 +62,7 @@
 		}
 	}
 
-	.piece-wrapper {
+	.coin-wrapper {
 		transform: scale(0);
 		opacity: 0;
 		transition:
@@ -71,10 +71,10 @@
 		filter: drop-shadow(0 0 0 transparent);
 	}
 
-	.piece-wrapper.piece-visible {
+	.coin-wrapper.coin-visible {
 		transform: scale(1);
 		opacity: 1;
-		filter: drop-shadow(0 0 20px var(--color-reward-glow));
+		filter: drop-shadow(0 0 24px var(--color-reward-glow));
 	}
 
 	.confetti-container {

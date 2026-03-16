@@ -16,6 +16,6 @@
 	};
 </script>
 
-<div class="bg-surface-raised rounded-xl shadow-sm {paddingClasses[padding]} {className}">
+<div class="bg-surface rounded-2xl border border-surface-raised shadow-sm {paddingClasses[padding]} {className}">
 	{@render children()}
 </div>

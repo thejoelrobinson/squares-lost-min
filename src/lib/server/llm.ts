@@ -5,11 +5,11 @@ const DEFAULT_MODEL = 'google/gemini-2.0-flash-001';
 
 export async function evaluateComprehension(params: {
 	lessonTitle: string;
-	lessonObjectives: string;
+	lessonObjectives: string[];
 	userRole: string;
 	userTeamSize: number;
 	userComfortLevel: number;
-	transcript: string;
+	transcript: Array<{ role: string; content: string }>;
 }): Promise<{ understood: boolean; confidence: number; gaps: string[]; summary: string }> {
 	if (!env.OPENROUTER_API_KEY) {
 		return {
@@ -20,12 +20,20 @@ export async function evaluateComprehension(params: {
 		};
 	}
 
+	const objectivesList = params.lessonObjectives
+		.map((o, i) => `${i + 1}. ${o}`)
+		.join('\n');
+
+	const formattedTranscript = params.transcript
+		.map((t) => `${t.role === 'user' ? 'Learner' : 'AI Host'}: ${t.content}`)
+		.join('\n');
+
 	const systemPrompt = `You are evaluating a learner's understanding of "${params.lessonTitle}".
 The learner is a ${params.userRole} who manages ${params.userTeamSize} people.
 They rated their feedback comfort level at ${params.userComfortLevel}/5.
 
 Lesson objectives:
-${params.lessonObjectives}
+${objectivesList}
 
 Evaluate the following conversation/response for genuine understanding,
 not rote repetition. Be generous but honest. Return JSON only.
@@ -50,7 +58,7 @@ Return a JSON object with this exact structure:
 			model,
 			messages: [
 				{ role: 'system', content: systemPrompt },
-				{ role: 'user', content: params.transcript }
+				{ role: 'user', content: formattedTranscript }
 			],
 			response_format: { type: 'json_object' }
 		})

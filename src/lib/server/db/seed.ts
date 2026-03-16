@@ -16,61 +16,59 @@ const lessonData: Array<{
 	{ partNumber: 1, title: 'Getting to Know You', slug: 'onboarding', puzzlePosition: null },
 	{
 		partNumber: 2,
-		title: 'Why Feedback Matters',
+		title: 'The Psychology and Perception of Feedback',
 		slug: 'why-feedback-matters',
 		puzzlePosition: 'top-left'
 	},
 	{
 		partNumber: 3,
-		title: 'The SBI Framework',
+		title: 'The Chronology and Purpose of Intervention',
 		slug: 'sbi-framework',
 		puzzlePosition: 'top-center'
 	},
 	{
 		partNumber: 4,
-		title: 'Timing Is Everything',
+		title: 'The SBI Structural Model',
 		slug: 'timing-is-everything',
 		puzzlePosition: 'top-right'
 	},
+	{ partNumber: 5, title: 'Test 1', slug: 'test-1', puzzlePosition: null },
 	{
-		partNumber: 5,
-		title: 'Reading the Room',
+		partNumber: 6,
+		title: 'Transforming Delivery into Dialogue (The SBI-N Model)',
 		slug: 'reading-the-room',
 		puzzlePosition: 'middle-left'
 	},
-	{ partNumber: 6, title: 'Being Specific', slug: 'being-specific', puzzlePosition: 'center' },
 	{
 		partNumber: 7,
-		title: 'The Hard Conversations',
-		slug: 'hard-conversations',
-		puzzlePosition: 'middle-right'
+		title: 'Real-World Case Studies and Scenarios',
+		slug: 'being-specific',
+		puzzlePosition: 'center'
 	},
 	{
 		partNumber: 8,
-		title: 'Listening After You Speak',
+		title: 'Navigating Cognitive Resistance (The 4 Ds)',
+		slug: 'hard-conversations',
+		puzzlePosition: 'middle-right'
+	},
+	{ partNumber: 9, title: 'Test 2', slug: 'test-2', puzzlePosition: null },
+	{
+		partNumber: 10,
+		title: 'Advanced Tactics for Guiding Difficult Conversations',
 		slug: 'listening-after-you-speak',
 		puzzlePosition: 'bottom-left'
 	},
-	{
-		partNumber: 9,
-		title: 'Making It Actionable',
-		slug: 'making-it-actionable',
-		puzzlePosition: 'bottom-center'
-	},
-	{
-		partNumber: 10,
-		title: 'Putting It All Together',
-		slug: 'putting-it-together',
-		puzzlePosition: 'bottom-right'
-	}
+	{ partNumber: 11, title: 'Final Test', slug: 'final-test', puzzlePosition: null }
 ];
 
 async function seed() {
 	console.log(`Seeding database at: ${DATABASE_URL}`);
 
-	// Delete existing lessons for idempotency
+	// Delete existing data for idempotency (child tables first due to FK constraints)
+	await db.delete(schema.conversations);
+	await db.delete(schema.lessonProgress);
 	await db.delete(schema.lessons);
-	console.log('Cleared existing lessons.');
+	console.log('Cleared existing data.');
 
 	// Insert lessons
 	const rows = lessonData.map((lesson) => ({
@@ -78,7 +76,7 @@ async function seed() {
 		partNumber: lesson.partNumber,
 		title: lesson.title,
 		slug: lesson.slug,
-		podcastUrl: `/audio/${String(lesson.partNumber).padStart(2, '0')}-${lesson.slug}.mp3`,
+		podcastUrl: `/audio/${String(lesson.partNumber).padStart(2, '0')}-${lesson.slug}/podcast.mp3`,
 		transcript: '',
 		puzzlePosition: lesson.puzzlePosition
 	}));

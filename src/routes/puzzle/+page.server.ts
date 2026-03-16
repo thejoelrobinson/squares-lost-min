@@ -1,6 +1,7 @@
 import type { PageServerLoad } from './$types';
 import { redirect } from '@sveltejs/kit';
 import { getProgressForUser, getAllLessons } from '$lib/server/db/queries';
+import { getLessonContent } from '$lib/content/lesson-data';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.userId) throw redirect(303, '/onboarding');
@@ -13,11 +14,13 @@ export const load: PageServerLoad = async ({ locals }) => {
 		.filter((l) => l.partNumber >= 2)
 		.map((lesson) => {
 			const prog = progress.find((p) => p.lesson_progress.lessonId === lesson.id);
+			const content = getLessonContent(lesson.slug);
 			return {
 				position: lesson.puzzlePosition,
 				lessonTitle: lesson.title,
 				earned: prog?.lesson_progress.puzzleEarned === true,
-				partNumber: lesson.partNumber
+				partNumber: lesson.partNumber,
+				coinImage: content?.coinImage
 			};
 		});
 

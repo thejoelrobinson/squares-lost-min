@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { getUserById } from '$lib/server/db/queries';
 import { getLessonBySlug } from '$lib/server/db/queries';
 import { evaluateComprehension } from '$lib/server/llm';
+import { getLessonContent } from '$lib/content/lesson-data';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.userId) {
@@ -31,9 +32,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		error(404, 'Lesson not found');
 	}
 
+	// Use structured objectives from lesson-data.ts, falling back to generic title-based objectives
+	const content = getLessonContent(lesson.slug);
+	const objectives = content?.objectives ?? [`Understand the key concepts of "${lesson.title}"`];
+
 	const result = await evaluateComprehension({
 		lessonTitle: lesson.title,
-		lessonObjectives: lesson.transcript, // Using transcript as proxy for objectives
+		lessonObjectives: objectives,
 		userRole: user.role,
 		userTeamSize: user.teamSize,
 		userComfortLevel: user.comfortLevel,

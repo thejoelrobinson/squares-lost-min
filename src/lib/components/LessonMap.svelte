@@ -1,4 +1,5 @@
 <script lang="ts">
+	import SparkCoin from '$lib/components/SparkCoin.svelte';
 	import type { LessonStatus } from '$lib/types';
 
 	interface LessonItem {
@@ -22,6 +23,23 @@
 
 	let { lessons, progress }: Props = $props();
 
+	const MAX_TITLE_CHARS = 22;
+
+	function splitTitle(title: string): string[] {
+		if (title.length <= MAX_TITLE_CHARS) return [title];
+		const mid = title.lastIndexOf(' ', MAX_TITLE_CHARS);
+		if (mid <= 0) return [title];
+		return [title.slice(0, mid), title.slice(mid + 1)];
+	}
+
+	function getTitleX(x: number): number {
+		return x > 200 ? x - NODE_RADIUS - 12 : x + NODE_RADIUS + 12;
+	}
+
+	function getTitleAnchor(x: number): string {
+		return x > 200 ? 'end' : 'start';
+	}
+
 	const SVG_WIDTH = 400;
 	const NODE_RADIUS = 24;
 	const VERTICAL_SPACING = 90;
@@ -42,8 +60,13 @@
 		return svgHeight - BOTTOM_PADDING - index * VERTICAL_SPACING;
 	}
 
+	// Build a lookup map for O(1) status checks
+	let progressMap = $derived(
+		new Map(progress.map((p) => [p.lessonId, p]))
+	);
+
 	function getStatus(lessonId: string): LessonStatus {
-		const p = progress.find((pr) => pr.lessonId === lessonId);
+		const p = progressMap.get(lessonId);
 		return (p?.status as LessonStatus) ?? 'locked';
 	}
 
@@ -96,27 +119,17 @@
 		}
 	});
 
-	// Total puzzle pieces earned
-	let puzzlesEarned = $derived(
+	// Total Spark Points earned
+	let sparksEarned = $derived(
 		progress.filter((p) => p.puzzleEarned === 1).length
 	);
 </script>
 
 <div class="lesson-map" bind:this={mapContainer}>
-	<!-- Puzzle thumbnail link -->
-	<a href="/puzzle" class="puzzle-thumbnail">
-		<svg viewBox="0 0 36 36" width="36" height="36" aria-hidden="true">
-			<rect x="1" y="1" width="10" height="10" rx="1" class="puzzle-piece" class:earned={puzzlesEarned >= 1} />
-			<rect x="13" y="1" width="10" height="10" rx="1" class="puzzle-piece" class:earned={puzzlesEarned >= 2} />
-			<rect x="25" y="1" width="10" height="10" rx="1" class="puzzle-piece" class:earned={puzzlesEarned >= 3} />
-			<rect x="1" y="13" width="10" height="10" rx="1" class="puzzle-piece" class:earned={puzzlesEarned >= 4} />
-			<rect x="13" y="13" width="10" height="10" rx="1" class="puzzle-piece" class:earned={puzzlesEarned >= 5} />
-			<rect x="25" y="13" width="10" height="10" rx="1" class="puzzle-piece" class:earned={puzzlesEarned >= 6} />
-			<rect x="1" y="25" width="10" height="10" rx="1" class="puzzle-piece" class:earned={puzzlesEarned >= 7} />
-			<rect x="13" y="25" width="10" height="10" rx="1" class="puzzle-piece" class:earned={puzzlesEarned >= 8} />
-			<rect x="25" y="25" width="10" height="10" rx="1" class="puzzle-piece" class:earned={puzzlesEarned >= 9} />
-		</svg>
-		<span class="puzzle-count">{puzzlesEarned}/9</span>
+	<!-- Spark Points link -->
+	<a href="/puzzle" class="spark-badge">
+		<SparkCoin size={28} />
+		<span class="spark-count">{sparksEarned}/7</span>
 	</a>
 
 	<!-- Main SVG map -->
@@ -188,7 +201,6 @@
 
 						<!-- Part number -->
 						{#if isComplete}
-							<!-- Checkmark icon -->
 							<path
 								d="M {x - 8} {y} L {x - 2} {y + 6} L {x + 10} {y - 6}"
 								fill="none"
@@ -213,14 +225,20 @@
 
 						<!-- Title label -->
 						<text
-							x={x > 200 ? x - NODE_RADIUS - 12 : x + NODE_RADIUS + 12}
-							y={y + 1}
-							text-anchor={x > 200 ? 'end' : 'start'}
+							x={getTitleX(x)}
+							y={splitTitle(lesson.title).length > 1 ? y - 7 : y + 1}
+							text-anchor={getTitleAnchor(x)}
 							dominant-baseline="central"
 							class="node-title"
 							class:node-title-locked={!isActive}
 						>
-							{lesson.title}
+							{#each splitTitle(lesson.title) as line, li (li)}
+								{#if li === 0}
+									{line}
+								{:else}
+									<tspan x={getTitleX(x)} dy="16">{line}</tspan>
+								{/if}
+							{/each}
 						</text>
 					</a>
 				{:else}
@@ -241,13 +259,19 @@
 						{lesson.partNumber}
 					</text>
 					<text
-						x={x > 200 ? x - NODE_RADIUS - 12 : x + NODE_RADIUS + 12}
-						y={y + 1}
-						text-anchor={x > 200 ? 'end' : 'start'}
+						x={getTitleX(x)}
+						y={splitTitle(lesson.title).length > 1 ? y - 7 : y + 1}
+						text-anchor={getTitleAnchor(x)}
 						dominant-baseline="central"
 						class="node-title node-title-locked"
 					>
-						{lesson.title}
+						{#each splitTitle(lesson.title) as line, li (li)}
+							{#if li === 0}
+								{line}
+							{:else}
+								<tspan x={getTitleX(x)} dy="16">{line}</tspan>
+							{/if}
+						{/each}
 					</text>
 				{/if}
 			</g>
@@ -264,7 +288,7 @@
 		padding: 1rem 0;
 	}
 
-	.puzzle-thumbnail {
+	.spark-badge {
 		position: sticky;
 		top: 0.5rem;
 		float: right;
@@ -274,33 +298,23 @@
 		gap: 0.375rem;
 		background: var(--color-surface);
 		border: 1px solid var(--color-surface-raised);
-		border-radius: 0.5rem;
-		padding: 0.375rem 0.625rem;
+		border-radius: 9999px;
+		padding: 0.375rem 0.75rem;
 		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 		text-decoration: none;
-		transition: box-shadow 0.2s;
+		transition: box-shadow 0.2s, transform 0.15s;
 		margin-right: 0.5rem;
 	}
 
-	.puzzle-thumbnail:hover {
+	.spark-badge:hover {
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+		transform: scale(1.05);
 	}
 
-	.puzzle-count {
-		font-size: 0.75rem;
-		font-weight: 600;
-		color: var(--color-text-muted);
-	}
-
-	.puzzle-piece {
-		fill: var(--color-surface-raised);
-		stroke: var(--color-text-muted);
-		stroke-width: 0.5;
-	}
-
-	.puzzle-piece.earned {
-		fill: var(--color-accent);
-		stroke: var(--color-accent);
+	.spark-count {
+		font-size: 0.8rem;
+		font-weight: 700;
+		color: var(--color-text);
 	}
 
 	/* Path */

@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { Conversation, type Mode, type Status as ELStatus } from '@11labs/client';
+	import { Conversation, type Mode } from '@11labs/client';
 	import type { DisconnectionDetails } from '@11labs/client';
 	import Button from './Button.svelte';
 	import Card from './Card.svelte';
 
 	let {
-		lessonId,
+		lessonId: _lessonId,
 		lessonSlug,
 		onComplete
 	}: {
@@ -18,15 +18,24 @@
 	let transcript = $state<Array<{ role: 'user' | 'ai'; text: string }>>([]);
 	let agentConfig = $state<{
 		agentId: string;
-		systemPrompt: string;
-		firstMessage: string;
+		dynamicVariables?: Record<string, string | number | boolean>;
 	} | null>(null);
 	let error = $state<string | null>(null);
 	let mode = $state<Mode>('listening');
-	let conversation = $state<Conversation | null>(null);
+	let conversation: Conversation | null = null;
 	let score = $state<number | null>(null);
 
 	let isSpeaking = $derived(mode === 'speaking');
+
+	// Clean up conversation on unmount
+	$effect(() => {
+		return () => {
+			if (conversation) {
+				conversation.endSession();
+				conversation = null;
+			}
+		};
+	});
 
 	function scrollToBottom(node: HTMLElement) {
 		if (transcript.length > 0) {
@@ -37,7 +46,7 @@
 	async function fetchAgentConfig() {
 		try {
 			const res = await fetch(
-				`/api/comprehension/agent-config?lessonId=${encodeURIComponent(lessonId)}`
+				`/api/comprehension/agent-config?lessonId=${encodeURIComponent(lessonSlug)}`
 			);
 			if (!res.ok) {
 				throw new Error('Failed to fetch agent configuration');
@@ -63,26 +72,11 @@
 		if (!agentConfig) return;
 
 		try {
-			await navigator.mediaDevices.getUserMedia({ audio: true });
-		} catch {
-			error =
-				'Microphone access is required for voice mode. Please allow microphone access and try again.';
-			status = 'error';
-			return;
-		}
-
-		try {
-			conversation = await Conversation.startSession({
+			const conv = await Conversation.startSession({
 				agentId: agentConfig.agentId,
 				connectionType: 'websocket',
-				overrides: {
-					agent: {
-						prompt: {
-							prompt: agentConfig.systemPrompt
-						},
-						firstMessage: agentConfig.firstMessage
-					}
-				},
+				useWakeLock: true,
+				dynamicVariables: agentConfig.dynamicVariables ?? {},
 				onConnect: () => {
 					status = 'active';
 				},
@@ -96,22 +90,19 @@
 				onModeChange: (prop: { mode: Mode }) => {
 					mode = prop.mode;
 				},
-				onStatusChange: (prop: { status: ELStatus }) => {
-					if (prop.status === 'disconnected' && status === 'active') {
-						handleConversationEnd();
-					}
-				},
-				onDisconnect: (_details: DisconnectionDetails) => {
-					if (status === 'active') {
+				onDisconnect: (details: DisconnectionDetails) => {
+					conversation = null;
+					if (details.reason !== 'user' && status === 'active') {
 						handleConversationEnd();
 					}
 				}
 			});
+			conversation = conv;
 		} catch (err) {
-			error =
-				err instanceof Error
-					? err.message
-					: 'Failed to start voice conversation';
+			const msg = err instanceof Error ? err.message : '';
+			error = msg.toLowerCase().includes('permission') || msg.toLowerCase().includes('denied')
+				? 'Microphone access is required. Please allow microphone access and try again.'
+				: 'Failed to start voice conversation.';
 			status = 'error';
 		}
 	}
@@ -119,7 +110,9 @@
 	async function endConversation() {
 		if (conversation) {
 			await conversation.endSession();
+			conversation = null;
 		}
+		handleConversationEnd();
 	}
 
 	async function handleConversationEnd() {
@@ -133,8 +126,8 @@
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					lessonId,
-					lessonSlug,
+					lessonId: lessonSlug,
+					mode: 'voice',
 					transcript: transcript.map((t) => ({
 						role: t.role,
 						content: t.text
@@ -143,7 +136,7 @@
 			});
 
 			if (!res.ok) {
-				throw new Error('Failed to evaluate comprehension');
+				throw new Error(`Failed to evaluate comprehension: ${res.status}`);
 			}
 
 			const result = await res.json();

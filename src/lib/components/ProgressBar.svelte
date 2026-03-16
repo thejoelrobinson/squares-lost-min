@@ -7,7 +7,7 @@
 	let { currentPhase, lessonTitle }: Props = $props();
 
 	const phases = ['podcast', 'comprehension', 'reward'] as const;
-	const labels = { podcast: 'Podcast', comprehension: 'Comprehension', reward: 'Reward' };
+	const labels = { podcast: 'Learn', comprehension: 'Check-In', reward: 'Reward' };
 
 	function getPhaseStatus(phase: (typeof phases)[number]) {
 		const currentIndex = phases.indexOf(currentPhase);

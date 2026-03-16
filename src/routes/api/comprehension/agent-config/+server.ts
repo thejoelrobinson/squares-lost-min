@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getUserById, getLessonBySlug } from '$lib/server/db/queries';
 import { buildAgentConfig } from '$lib/server/elevenlabs';
+import { getLessonContent } from '$lib/content/lesson-data';
 
 export const GET: RequestHandler = async ({ url, locals }) => {
 	if (!locals.userId) {
@@ -23,6 +24,12 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 		error(404, 'Lesson not found');
 	}
 
+	const content = getLessonContent(lesson.slug);
+	const objectives = content?.objectives ?? [];
+	const objectivesList = objectives.map((o, i) => `${i + 1}. ${o}`).join('\n');
+
+	const transcriptContext = `MODE: COMPREHENSION CHECK — Assess the learner's understanding through Socratic dialogue. Do not re-teach; probe what they retained.\n\nLesson objectives to assess:\n${objectivesList}\n\nKeep the check to 3-5 exchanges. When satisfied they understand, wrap up naturally.`;
+
 	const config = buildAgentConfig(
 		{ title: lesson.title, slug: lesson.slug },
 		{
@@ -30,7 +37,8 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 			role: user.role,
 			teamSize: user.teamSize,
 			comfortLevel: user.comfortLevel
-		}
+		},
+		transcriptContext
 	);
 
 	return json(config);

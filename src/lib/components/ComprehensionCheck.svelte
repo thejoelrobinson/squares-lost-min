@@ -13,8 +13,12 @@
 		lessonSlug: string;
 		lessonId: string;
 		quiz: QuizQuestion[];
-		onComplete: (score: number) => void;
+		onComplete: (score: number, hearts: number) => void;
 	} = $props();
+
+	function handleVoiceComplete(score: number) {
+		onComplete(score, 3); // Voice mode doesn't use hearts
+	}
 
 	let mode = $state<'quiz' | 'voice'>('quiz');
 </script>
@@ -42,16 +46,16 @@
 
 	{#if mode === 'quiz'}
 		{#if quiz.length > 0}
-			<QuizContainer questions={quiz} {onComplete} />
+			<QuizContainer questions={quiz} {lessonSlug} {onComplete} />
 		{:else}
 			<div class="rounded-xl bg-surface-raised p-8 text-center">
 				<p class="text-text-muted">No quiz questions available for this lesson.</p>
 				<div class="mt-4">
-					<Button onclick={() => onComplete(1)}>Continue</Button>
+					<Button onclick={() => onComplete(1, 3)}>Continue</Button>
 				</div>
 			</div>
 		{/if}
 	{:else if mode === 'voice'}
-		<VoiceChat {lessonId} {lessonSlug} {onComplete} />
+		<VoiceChat {lessonId} {lessonSlug} onComplete={handleVoiceComplete} />
 	{/if}
 </div>

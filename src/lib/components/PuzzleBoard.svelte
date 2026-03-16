@@ -1,9 +1,12 @@
 <script lang="ts">
+	import SparkCoin from '$lib/components/SparkCoin.svelte';
+
 	interface PuzzlePiece {
 		position: string | null;
 		lessonTitle: string;
 		earned: boolean;
 		partNumber: number;
+		coinImage?: string;
 	}
 
 	let { pieces }: { pieces: PuzzlePiece[] } = $props();
@@ -47,37 +50,17 @@
 >
 	{#each grid as row, rowIndex (rowIndex)}
 		{#each row as cell, colIndex (colIndex)}
-			{@const positionKey = Object.entries(gridPositions).find(
-				([, v]) => v.row === rowIndex && v.col === colIndex
-			)?.[0]}
-			<div class="puzzle-cell aspect-square w-[150px] overflow-hidden rounded-lg">
+			<div class="puzzle-cell flex aspect-square w-[150px] flex-col items-center justify-center gap-1 overflow-hidden rounded-2xl bg-surface-raised p-2">
 				{#if cell && cell.earned}
-					<div class="earned-piece h-full w-full">
-						<img
-							src="/puzzle/{positionKey}.svg"
-							alt={cell.lessonTitle}
-							class="h-full w-full object-cover"
-						/>
+					<div class="earned-piece">
+						<SparkCoin size={80} backImage={cell.coinImage} />
 					</div>
+					<span class="text-center text-xs font-medium text-text">{cell.lessonTitle}</span>
 				{:else}
-					<div
-						class="flex h-full w-full flex-col items-center justify-center gap-2 bg-gray-200 p-3"
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class="h-8 w-8 text-gray-400"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-							stroke-width="2"
-						>
-							<rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-							<path d="M7 11V7a5 5 0 0 1 10 0v4" />
-						</svg>
-						<span class="text-center text-xs text-gray-500">
-							{cell ? cell.lessonTitle : 'Part ' + (rowIndex * 3 + colIndex + 2)}
-						</span>
-					</div>
+					<SparkCoin size={80} muted />
+					<span class="text-center text-xs text-text-muted">
+						{cell ? cell.lessonTitle : 'Part ' + (rowIndex * 3 + colIndex + 2)}
+					</span>
 				{/if}
 			</div>
 		{/each}

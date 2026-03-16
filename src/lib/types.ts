@@ -47,10 +47,31 @@ export interface ComprehensionAssessment {
 }
 
 export interface QuizQuestion {
-	type: 'multiple-choice' | 'order' | 'freeform';
+	type: 'multiple-choice' | 'order' | 'freeform' | 'fill-in-the-blank' | 'true-false' | 'matching';
 	question: string;
 	options?: string[];
 	correct?: number | number[];
 	items?: string[];
 	evaluationHint?: string;
+	/** fill-in-the-blank: available words to drag into blanks */
+	wordBank?: string[];
+	/** fill-in-the-blank: correct answers for each blank in order */
+	blanks?: string[];
+	/** true-false: the correct answer */
+	correctBool?: boolean;
+	/** true-false / matching: explanation shown after answering */
+	explanation?: string;
+	/** matching: left-side items */
+	leftItems?: string[];
+	/** matching: right-side items */
+	rightItems?: string[];
+	/** matching: correct mapping — correctPairs[i] is the rightItems index for leftItems[i] */
+	correctPairs?: number[];
+}
+
+export interface SubtitleCue {
+	id: number;
+	start: number;
+	end: number;
+	text: string;
 }
