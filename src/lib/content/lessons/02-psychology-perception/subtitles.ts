@@ -3,7 +3,7 @@ import type { SubtitleCue } from '$lib/types';
 export type { SubtitleCue as Cue };
 
 export const cues: SubtitleCue[] = [
-	{ id: 1, start: 0, end: 4.629, text: 'Welcome back to The Leadership Loop. I\'m Jamie, and as always, I\'m' },
+	{ id: 1, start: 0, end: 4.629, text: 'Welcome back to Walmart Academy\'s The Art of Feedback. I\'m Jamie, and as always, I\'m' },
 	{ id: 2, start: 4.629, end: 8.444, text: 'joined by my co-host and resident leadership strategist, Alex.' },
 	{ id: 3, start: 9.128, end: 13.729, text: 'Great to be here, Jamie. Today we\'re diving into a topic that makes' },
 	{ id: 4, start: 13.729, end: 18.33, text: 'pretty much everyone sweat a little bit: feedback. Specifically, we\'re kicking' },

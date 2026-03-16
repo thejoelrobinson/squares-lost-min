@@ -3,23 +3,37 @@
 	import Button from './Button.svelte';
 	import Card from './Card.svelte';
 
+	interface ExistingUser {
+		name: string;
+		lastName: string;
+		role: string;
+		teamSize: number;
+		feedbackFrequency: string;
+		comfortLevel: number;
+		challenges: string;
+		scenario: string | null;
+	}
+
+	let { existingUser = null }: { existingUser?: ExistingUser | null } = $props();
+
 	let currentStep = $state(1);
 	const totalSteps = 7;
 
-	// Form state
-	let name = $state('');
-	let role = $state('');
-	let teamSize = $state(5);
-	let feedbackFrequency = $state('');
-	let comfortLevel = $state(3);
-	let challenges = $state<string[]>([]);
-	let scenario = $state('');
+	// Form state — pre-populate from existing user if available
+	let firstName = $state(existingUser?.name ?? '');
+	let lastName = $state(existingUser?.lastName ?? '');
+	let role = $state(existingUser?.role ?? '');
+	let teamSize = $state(existingUser?.teamSize ?? 5);
+	let feedbackFrequency = $state(existingUser?.feedbackFrequency ?? '');
+	let comfortLevel = $state(existingUser?.comfortLevel ?? 3);
+	let challenges = $state<string[]>(existingUser ? JSON.parse(existingUser.challenges) : []);
+	let scenario = $state(existingUser?.scenario ?? '');
 
 	// Validation
 	let canContinue = $derived.by(() => {
 		switch (currentStep) {
 			case 1:
-				return name.trim().length > 0 && role.length > 0;
+				return firstName.trim().length > 0 && lastName.trim().length > 0 && role.length > 0;
 			case 2:
 				return teamSize >= 1;
 			case 3:
@@ -99,21 +113,35 @@
 		<!-- Step 1: Name & Role -->
 		{#if currentStep === 1}
 			<Card padding="lg">
-				<h2 class="mb-1 text-2xl font-bold text-text">Welcome to FeedbackLoop!</h2>
-				<p class="mb-6 text-text-muted">Let's start with some basics about you.</p>
+				<h2 class="mb-1 text-2xl font-bold text-text">{existingUser ? 'Update Your Profile' : 'Welcome to FeedbackLoop!'}</h2>
+				<p class="mb-6 text-text-muted">{existingUser ? 'Review and update your info.' : "Let's start with some basics about you."}</p>
 
 				<div class="space-y-4">
-					<div>
-						<label for="name" class="mb-1 block text-sm font-medium text-text">
-							What's your name?
-						</label>
-						<input
-							id="name"
-							type="text"
-							bind:value={name}
-							placeholder="Enter your name"
-							class="w-full rounded-lg border border-primary/20 bg-surface px-4 py-2.5 text-text placeholder:text-text-muted/50 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
-						/>
+					<div class="grid grid-cols-2 gap-3">
+						<div>
+							<label for="firstName" class="mb-1 block text-sm font-medium text-text">
+								First name
+							</label>
+							<input
+								id="firstName"
+								type="text"
+								bind:value={firstName}
+								placeholder="Joel"
+								class="w-full rounded-lg border border-primary/20 bg-surface px-4 py-2.5 text-text placeholder:text-text-muted/50 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
+							/>
+						</div>
+						<div>
+							<label for="lastName" class="mb-1 block text-sm font-medium text-text">
+								Last name
+							</label>
+							<input
+								id="lastName"
+								type="text"
+								bind:value={lastName}
+								placeholder="Robinson"
+								class="w-full rounded-lg border border-primary/20 bg-surface px-4 py-2.5 text-text placeholder:text-text-muted/50 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
+							/>
+						</div>
 					</div>
 
 					<div>
@@ -282,7 +310,7 @@
 					<div class="flex items-start justify-between rounded-lg bg-surface p-3">
 						<div>
 							<p class="text-sm text-text-muted">Name & Role</p>
-							<p class="font-medium text-text">{name} &middot; {role}</p>
+							<p class="font-medium text-text">{firstName} {lastName} &middot; {role}</p>
 						</div>
 						<button type="button" onclick={() => goToStep(1)} class="text-sm text-primary hover:underline">Edit</button>
 					</div>
@@ -331,7 +359,8 @@
 				</div>
 
 				<!-- Hidden inputs to submit all values -->
-				<input type="hidden" name="name" value={name} />
+				<input type="hidden" name="firstName" value={firstName} />
+				<input type="hidden" name="lastName" value={lastName} />
 				<input type="hidden" name="role" value={role} />
 				<input type="hidden" name="teamSize" value={teamSize} />
 				<input type="hidden" name="feedbackFrequency" value={feedbackFrequency} />

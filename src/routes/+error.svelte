@@ -1,9 +1,32 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import Button from '$lib/components/Button.svelte';
 </script>
 
-<div class="flex min-h-[50vh] flex-col items-center justify-center gap-4">
-	<h1 class="text-4xl font-bold text-error">{page.status}</h1>
-	<p class="text-text-muted">{page.error?.message ?? 'Something went wrong'}</p>
-	<a href="/" class="text-primary hover:underline">Back to home</a>
+<div class="flex min-h-[50vh] flex-col items-center justify-center gap-6">
+	<!-- Jamie avatar with ? -->
+	<div class="relative">
+		<div class="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-accent to-primary shadow-lg">
+			<svg viewBox="0 0 28 32" class="h-10 w-10" fill="white" aria-hidden="true">
+				<path d="M19.69 14.58c.65-.14 6.45-2.84 6.97-3.15 1.18-.69 1.59-2.23.9-3.43-.68-1.2-2.19-1.61-3.37-.92-.52.3-5.72 4.06-6.16 4.57-.51.58-.6 1.42-.22 2.08.38.66 1.13 1 1.88.85z"/>
+				<path d="M26.66 20.57c-.52-.3-6.32-3.01-6.97-3.15-.75-.16-1.51.18-1.88.85-.38.66-.29 1.5.22 2.08.44.51 5.64 4.27 6.16 4.57 1.18.69 2.69.28 3.37-.92.68-1.2.28-2.74-.9-3.43z"/>
+				<path d="M13.95 20.53c-.75 0-1.42.5-1.66 1.24-.21.65-.81 7.11-.81 7.72 0 1.39 1.1 2.51 2.47 2.51s2.47-1.13 2.47-2.51c0-.61-.6-7.07-.81-7.72-.24-.74-.91-1.24-1.66-1.24z"/>
+				<path d="M8.21 17.42c-.66.14-6.45 2.84-6.97 3.15-1.18.69-1.59 2.23-.9 3.43.68 1.2 2.19 1.62 3.37.92.52-.3 5.72-4.06 6.16-4.57.51-.58.6-1.42.22-2.08-.38-.66-1.13-1-1.88-.85z"/>
+				<path d="M3.71 7.08c-1.18-.69-2.69-.28-3.37.92-.69 1.2-.28 2.74.9 3.43.52.3 6.32 3.01 6.97 3.15.75.16 1.51-.18 1.88-.85.38-.66.29-1.5-.22-2.08-.44-.51-5.64-4.27-6.16-4.57z"/>
+				<path d="M13.95 0c-1.36 0-2.47 1.13-2.47 2.51 0 .61.6 7.07.81 7.72.24.74.91 1.24 1.66 1.24s1.42-.5 1.66-1.24c.21-.65.81-7.11.81-7.72C16.42 1.13 15.31 0 13.95 0z"/>
+			</svg>
+		</div>
+		<div class="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full bg-error text-sm font-bold text-white shadow">
+			?
+		</div>
+	</div>
+
+	<div class="text-center">
+		<h1 class="text-5xl font-bold text-text">{page.status}</h1>
+		<p class="mt-2 text-lg text-text-muted">
+			{page.error?.message ?? 'Jamie got confused and lost the way'}
+		</p>
+	</div>
+
+	<Button href="/">Back to Home</Button>
 </div>

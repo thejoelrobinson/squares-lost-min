@@ -23,42 +23,36 @@
 		'bottom-right': { row: 2, col: 2 }
 	};
 
-	// Build a 3x3 grid array
 	let grid = $derived.by(() => {
 		const cells: (PuzzlePiece | null)[][] = [
 			[null, null, null],
 			[null, null, null],
 			[null, null, null]
 		];
-
 		for (const piece of pieces) {
 			if (piece.position && gridPositions[piece.position]) {
 				const { row, col } = gridPositions[piece.position];
 				cells[row][col] = piece;
 			}
 		}
-
 		return cells;
 	});
 
 	let allEarned = $derived(pieces.length === 9 && pieces.every((p) => p.earned));
 </script>
 
-<div
-	class="puzzle-board grid grid-cols-3 gap-1 rounded-xl p-2"
-	class:celebration={allEarned}
->
+<div class="puzzle-board" class:puzzle-celebration={allEarned}>
 	{#each grid as row, rowIndex (rowIndex)}
 		{#each row as cell, colIndex (colIndex)}
-			<div class="puzzle-cell flex aspect-square w-[150px] flex-col items-center justify-center gap-1 overflow-hidden rounded-2xl bg-surface-raised p-2">
+			<div class="puzzle-cell" class:puzzle-cell-earned={cell?.earned}>
 				{#if cell && cell.earned}
-					<div class="earned-piece">
-						<SparkCoin size={80} backImage={cell.coinImage} />
+					<div class="earned-coin">
+						<SparkCoin size={72} backImage={cell.coinImage} />
 					</div>
-					<span class="text-center text-xs font-medium text-text">{cell.lessonTitle}</span>
+					<span class="cell-title cell-title-earned">{cell.lessonTitle}</span>
 				{:else}
-					<SparkCoin size={80} muted />
-					<span class="text-center text-xs text-text-muted">
+					<SparkCoin size={72} muted />
+					<span class="cell-title">
 						{cell ? cell.lessonTitle : 'Part ' + (rowIndex * 3 + colIndex + 2)}
 					</span>
 				{/if}
@@ -69,35 +63,67 @@
 
 <style>
 	.puzzle-board {
-		background: color-mix(in oklch, var(--color-surface-raised) 80%, transparent);
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 0.625rem;
+		padding: 0.75rem;
+		border-radius: var(--radius-2xl);
+		background: var(--color-surface-raised);
+		border: 2px solid var(--color-border);
+		border-bottom-width: 4px;
+		border-bottom-color: var(--color-border-strong);
 	}
 
-	.puzzle-board.celebration {
-		box-shadow:
-			0 0 20px color-mix(in oklch, var(--color-reward-glow) 60%, transparent),
-			0 0 40px color-mix(in oklch, var(--color-reward-glow) 30%, transparent);
-		animation: celebrate-glow 2s ease-in-out infinite alternate;
+	.puzzle-celebration {
+		border-color: var(--color-accent);
+		box-shadow: var(--shadow-glow-accent);
+		animation: celebrate 2s ease-in-out infinite alternate;
 	}
 
-	@keyframes celebrate-glow {
-		from {
-			box-shadow:
-				0 0 20px color-mix(in oklch, var(--color-reward-glow) 60%, transparent),
-				0 0 40px color-mix(in oklch, var(--color-reward-glow) 30%, transparent);
-		}
-		to {
-			box-shadow:
-				0 0 30px color-mix(in oklch, var(--color-reward-glow) 80%, transparent),
-				0 0 60px color-mix(in oklch, var(--color-reward-glow) 50%, transparent);
-		}
+	@keyframes celebrate {
+		from { box-shadow: var(--shadow-glow-accent); }
+		to { box-shadow: 0 8px 40px oklch(82% 0.16 75 / 0.45); }
 	}
 
-	.earned-piece {
-		box-shadow: 0 0 12px color-mix(in oklch, var(--color-reward-glow) 40%, transparent);
+	.puzzle-cell {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+		aspect-ratio: 1;
+		padding: 0.75rem;
+		border-radius: var(--radius-xl);
+		background: var(--color-surface);
+		border: 2px solid var(--color-border);
+		border-bottom-width: 3px;
+		border-bottom-color: var(--color-border-strong);
+		transition: border-color 0.2s ease, box-shadow 0.2s ease;
+	}
+
+	.puzzle-cell-earned {
+		border-color: var(--color-accent);
+	}
+
+	.earned-coin {
 		transition: transform 0.2s ease;
+		filter: drop-shadow(0 2px 8px oklch(82% 0.16 75 / 0.3));
 	}
 
-	.earned-piece:hover {
-		transform: scale(1.05);
+	.earned-coin:hover {
+		transform: scale(1.08);
+	}
+
+	.cell-title {
+		font-size: 0.6875rem;
+		font-weight: 600;
+		text-align: center;
+		color: var(--color-text-muted);
+		line-height: 1.3;
+	}
+
+	.cell-title-earned {
+		color: var(--color-text);
+		font-weight: 700;
 	}
 </style>

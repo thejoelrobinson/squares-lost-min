@@ -1,43 +1,51 @@
 ---
 part: 3
-title: "The SBI Framework"
+title: "The Chronology and Purpose of Intervention"
 slug: "sbi-framework"
 ---
 
 ## Transcript
 
-**Jordan:** Alright, welcome back! Today we're getting into one of the most practical tools in the feedback toolkit — the SBI framework. Sam, you want to break it down?
+**Jamie:** Welcome back to Walmart Academy's The Art of Feedback. In our last episode, we talked about the psychology of feedback — how that "personal lens" makes us all react differently to the exact same words. I'm Jamie, and I'm back with our resident leadership strategist, Alex.
 
-**Sam:** Absolutely. SBI stands for Situation, Behavior, Impact. It's a simple three-part structure that helps you deliver feedback that's clear, specific, and non-judgmental. And that last part is really key — non-judgmental.
+**Alex:** Hey, Jamie! Now that we know how feedback is processed in the brain, it's time to talk about the when and the why. Today is all about the chronology and purpose of intervention.
 
-**Jordan:** Let's start with the S — Situation. What do we mean by that?
+**Jamie:** "Intervention" sounds like a heavy word, but we are really talking about the timing of feedback, right? Why is the clock so critical here?
 
-**Sam:** So the Situation is the when and where. You're anchoring your feedback to a specific moment in time. Instead of saying "you always do this," you say "in yesterday's team meeting" or "during our sprint planning on Tuesday." It grounds the conversation in something concrete.
+**Alex:** Because the effectiveness of feedback is intrinsically linked to when you deliver it. Timely feedback matters immensely because it allows leaders to step in while the moment is still highly relevant. If you intervene in real-time, learning can happen instantly. You can clarify assumptions and offer support right then and there.
 
-**Jordan:** And that immediately takes the heat down, right? Because you're not making a sweeping generalization about someone's character. You're pointing to a specific event.
+**Jamie:** So it's not just about reacting faster when things go wrong.
 
-**Sam:** Exactly. Then we move to B — Behavior. This is what the person actually did or said. And the key here is to describe observable behavior, not your interpretation of it. So instead of "you were disrespectful," which is a judgment, you'd say "you interrupted Alex twice while they were presenting."
+**Alex:** Exactly. The goal isn't merely to react faster to issues; it's to intervene early enough to actively shape outcomes, rather than just measuring them after the fact.
 
-**Jordan:** That's such an important distinction. "You were disrespectful" is going to make someone defensive immediately. But "you interrupted Alex twice" — that's just a fact. They can't really argue with it.
+**Jamie:** That's a great distinction — shaping the outcome versus measuring it later. So what does that look like in practice?
 
-**Sam:** Right, and it also gives them something specific to work with. If I tell you you're disrespectful, what do you even do with that? But if I tell you that you interrupted someone, you can address that specific behavior.
+**Alex:** It looks like capitalizing on everyday moments. Leaders are presented with so many chances every single day to check in, share their observations, and guide their associates. When you use those real-time moments, it creates a workplace culture where feedback feels completely normal. It becomes entirely supportive and focused on continuous growth, rather than being this intimidating, sweat-inducing event saved for a formal performance review.
 
-**Jordan:** Love it. And then the I — Impact.
+**Jamie:** I know what you mean, and in those everyday, real-time moments, what are we actually trying to achieve?
 
-**Sam:** The Impact is where you explain why the behavior mattered. What was the effect? This could be the impact on you, on the team, on the project, or on the person themselves. For example: "When you interrupted Alex, it made it hard for the team to hear their full proposal, and I noticed Alex seemed hesitant to speak up for the rest of the meeting."
+**Alex:** There are really just two primary objectives for giving feedback. First, to redirect behaviors that are starting to drift away from established expectations.
 
-**Jordan:** So putting the whole thing together, it would sound like: "In yesterday's team meeting — that's the Situation — you interrupted Alex twice while they were presenting — that's the Behavior — and it seemed to discourage them from contributing further, which meant we missed some important input — that's the Impact."
+**Jamie:** So, a gentle course correction.
 
-**Sam:** Exactly. Clean, specific, and focused on what happened rather than who someone is. And here's what I love about SBI — it works for positive feedback too! "During the client call this morning, you explained the timeline really clearly, and the client said it was the first time they fully understood the project scope." Situation, Behavior, Impact — all positive.
+**Alex:** Right. And second, to reinforce the behaviors that are working exceptionally well and driving success. We have to cheerlead the good stuff, too!
 
-**Jordan:** That's a great point. People often think frameworks like this are only for corrective feedback, but they're just as powerful for reinforcing good behavior.
+**Jamie:** Which is so easy to forget when we are busy putting out everyday fires. We usually only think of feedback as correcting mistakes.
 
-**Sam:** And honestly, if you start using SBI for positive feedback first, it builds your muscle memory. Then when you need to deliver something tougher, the structure is already second nature.
+**Alex:** Exactly, but positive reinforcement is arguably just as critical. It actually reminds me of a foundational piece of advice from Sam Walton. Mr. Sam always said: "Appreciate everything your associates do for the business. Nothing else can quite substitute for a few well-chosen, well-timed, sincere words of praise. They're absolutely free and worth a fortune."
 
-**Jordan:** That's a really smart approach. Start with the easy wins, build the habit, then apply it everywhere.
+**Jamie:** "Free and worth a fortune." I love that so much. And I notice he explicitly calls out that those words need to be well-timed.
 
-**Sam:** One more thing — SBI is a starting point, not a script. You deliver the SBI, and then you open it up for dialogue. "How did you see it?" or "What was going on from your perspective?" It's a conversation starter, not a verdict.
+**Alex:** He hit the nail on the head. That goes right back to our point about the timeline. Timely, ongoing feedback acts as a safeguard. It helps catch small dips in performance early on to ensure expectations and performance remain perfectly aligned. If you intervene early, the associate can adjust their course while the issue is still completely manageable.
 
-**Jordan:** Brilliant. Alright, that's the SBI framework — Situation, Behavior, Impact. Simple to remember, powerful in practice. Give it a try before your next one-on-one and see how it feels.
+**Jamie:** It prevents a molehill from becoming a mountain. Plus, speaking from an associate's perspective, consistent feedback builds immense trust.
 
-**Sam:** Trust us, it makes a difference. See you next time!
+**Alex:** Huge amounts of trust and engagement! Associates understand that their leaders are actually paying close attention and are genuinely invested in their professional growth. It significantly reduces surprises.
+
+**Jamie:** And nobody wants to be surprised at their annual evaluation.
+
+**Alex:** I know I don't. Ongoing guidance makes accountability much easier and paves the way for evaluations to be clearer and fairer. And as Mr. Sam pointed out, it reinforces strengths, too. Early acknowledgment of success encourages continued excellence and really builds an associate's confidence.
+
+**Jamie:** Catch them doing something right, or help them course-correct, and tell them immediately! That's a fantastic framework, Alex. Redirect the drift, reinforce the success, and do it in real-time.
+
+**Alex:** Next time on Walmart Academy's The Art of Feedback, we'll dive into the actual delivery and phrasing of these conversations.

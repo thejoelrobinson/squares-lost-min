@@ -8,14 +8,49 @@
 
 <svelte:head><title>Spark Points — FeedbackLoop</title></svelte:head>
 
-<div class="flex flex-col items-center gap-6">
-	<div class="flex flex-col items-center gap-2 text-center">
+<div class="puzzle-page">
+	<div class="puzzle-header">
 		<SparkCoin size={48} />
-		<h1 class="text-2xl font-bold text-text">Your Spark Points</h1>
-		<p class="text-text-muted mt-1">{data.earnedCount} of 7 Spark Points collected</p>
+		<h1 class="puzzle-title">Your Spark Points</h1>
+		<p class="puzzle-subtitle">{data.earnedCount} of 7 collected</p>
 	</div>
 
 	<PuzzleBoard pieces={data.pieces} />
 
-	<Button href="/" variant="secondary">Back to Lessons</Button>
+	<div class="puzzle-footer">
+		<Button href="/" variant="secondary">Back to Lessons</Button>
+	</div>
 </div>
+
+<style>
+	.puzzle-page {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1.5rem;
+	}
+
+	.puzzle-header {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.5rem;
+		text-align: center;
+	}
+
+	.puzzle-title {
+		font-size: 1.75rem;
+		font-weight: 800;
+		color: var(--color-text);
+	}
+
+	.puzzle-subtitle {
+		font-size: 0.875rem;
+		font-weight: 500;
+		color: var(--color-text-muted);
+	}
+
+	.puzzle-footer {
+		margin-top: 0.5rem;
+	}
+</style>

@@ -15,6 +15,7 @@ export interface LessonContent {
 import * as psychologyPerception from './lessons/02-psychology-perception/quiz';
 import { cues as psychologyPerceptionCues } from './lessons/02-psychology-perception/subtitles';
 import * as chronologyIntervention from './lessons/03-chronology-intervention/quiz';
+import { cues as chronologyInterventionCues } from './lessons/03-chronology-intervention/subtitles';
 import * as sbiStructuralModel from './lessons/04-sbi-structural-model/quiz';
 import * as deliveryIntoDialogue from './lessons/06-delivery-into-dialogue/quiz';
 import * as caseStudiesScenarios from './lessons/07-case-studies-scenarios/quiz';
@@ -30,7 +31,8 @@ export const lessonContent: Record<string, LessonContent> = {
 	},
 	'sbi-framework': {
 		...chronologyIntervention,
-		podcastFile: '/audio/03-sbi-framework/podcast.mp3'
+		podcastFile: '/audio/03-sbi-framework/podcast.mp3',
+		subtitles: chronologyInterventionCues
 	},
 	'timing-is-everything': {
 		...sbiStructuralModel,

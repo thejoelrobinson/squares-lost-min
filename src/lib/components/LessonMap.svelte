@@ -23,254 +23,182 @@
 
 	let { lessons, progress }: Props = $props();
 
-	const MAX_TITLE_CHARS = 22;
-
-	function splitTitle(title: string): string[] {
-		if (title.length <= MAX_TITLE_CHARS) return [title];
-		const mid = title.lastIndexOf(' ', MAX_TITLE_CHARS);
-		if (mid <= 0) return [title];
-		return [title.slice(0, mid), title.slice(mid + 1)];
-	}
-
-	function getTitleX(x: number): number {
-		return x > 200 ? x - NODE_RADIUS - 12 : x + NODE_RADIUS + 12;
-	}
-
-	function getTitleAnchor(x: number): string {
-		return x > 200 ? 'end' : 'start';
-	}
-
 	const SVG_WIDTH = 400;
-	const NODE_RADIUS = 24;
-	const VERTICAL_SPACING = 90;
-	const TOP_PADDING = 60;
-	const BOTTOM_PADDING = 60;
+	const NODE_R = 30;
+	const V_SPACE = 120;
+	const PAD_TOP = 80;
+	const PAD_BOT = 80;
+	const MAX_TITLE = 20;
 
-	let svgHeight = $derived(lessons.length * VERTICAL_SPACING + TOP_PADDING + BOTTOM_PADDING);
+	let svgH = $derived(lessons.length * V_SPACE + PAD_TOP + PAD_BOT);
+	const xPos = [115, 200, 285, 200];
 
-	// X positions for the winding snake pattern (left, center, right)
-	const xPositions = [100, 200, 300, 200];
+	function nx(i: number) { return xPos[i % xPos.length]; }
+	function ny(i: number) { return svgH - PAD_BOT - i * V_SPACE; }
 
-	function getNodeX(index: number): number {
-		return xPositions[index % xPositions.length];
+	let progressMap = $derived(new Map(progress.map((p) => [p.lessonId, p])));
+
+	function status(id: string): LessonStatus {
+		return (progressMap.get(id)?.status as LessonStatus) ?? 'locked';
 	}
 
-	// Y positions go bottom-to-top (earliest lesson at the bottom)
-	function getNodeY(index: number): number {
-		return svgHeight - BOTTOM_PADDING - index * VERTICAL_SPACING;
+	function href(l: LessonItem): string | null {
+		const s = status(l.id);
+		if (s === 'locked') return null;
+		if (l.partNumber === 1) return '/onboarding';
+		return `/lesson/${l.slug}`;
 	}
 
-	// Build a lookup map for O(1) status checks
-	let progressMap = $derived(
-		new Map(progress.map((p) => [p.lessonId, p]))
-	);
-
-	function getStatus(lessonId: string): LessonStatus {
-		const p = progressMap.get(lessonId);
-		return (p?.status as LessonStatus) ?? 'locked';
+	function splitTitle(t: string): string[] {
+		if (t.length <= MAX_TITLE) return [t];
+		const m = t.lastIndexOf(' ', MAX_TITLE);
+		return m <= 0 ? [t] : [t.slice(0, m), t.slice(m + 1)];
 	}
 
-	function getLessonHref(lesson: LessonItem): string | null {
-		const status = getStatus(lesson.id);
-		if (status === 'locked') return null;
-		if (lesson.partNumber === 1) return '/onboarding';
-		return `/lesson/${lesson.slug}`;
-	}
+	function titleX(x: number) { return x > 200 ? x - NODE_R - 18 : x + NODE_R + 18; }
+	function titleAnchor(x: number) { return x > 200 ? 'end' : 'start'; }
 
-	// Build the meandering SVG path through all nodes
 	let pathD = $derived.by(() => {
-		if (lessons.length === 0) return '';
-		const points = lessons.map((_, i) => ({ x: getNodeX(i), y: getNodeY(i) }));
-		// Start at the first node (bottom)
-		let d = `M ${points[0].x} ${points[0].y}`;
-		for (let i = 1; i < points.length; i++) {
-			const prev = points[i - 1];
-			const curr = points[i];
-			// Use a smooth cubic bezier for the winding effect
-			const cpOffsetY = (prev.y - curr.y) / 2;
-			const cp1x = prev.x;
-			const cp1y = prev.y - cpOffsetY;
-			const cp2x = curr.x;
-			const cp2y = curr.y + cpOffsetY;
-			d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${curr.x} ${curr.y}`;
+		if (!lessons.length) return '';
+		const pts = lessons.map((_, i) => ({ x: nx(i), y: ny(i) }));
+		let d = `M ${pts[0].x} ${pts[0].y}`;
+		for (let i = 1; i < pts.length; i++) {
+			const p = pts[i - 1], c = pts[i];
+			const dy = (p.y - c.y) / 2;
+			d += ` C ${p.x} ${p.y - dy}, ${c.x} ${c.y + dy}, ${c.x} ${c.y}`;
 		}
 		return d;
 	});
 
-	// Find the first available or in-progress lesson index for auto-scroll
-	let currentLessonIndex = $derived.by(() => {
-		const inProgressStates: LessonStatus[] = [
-			'available',
-			'podcast_complete',
-			'comprehension_complete'
-		];
-		const idx = lessons.findIndex((l) => inProgressStates.includes(getStatus(l.id)));
+	let currentIdx = $derived.by(() => {
+		const active: LessonStatus[] = ['available', 'podcast_complete', 'comprehension_complete'];
+		const idx = lessons.findIndex((l) => active.includes(status(l.id)));
 		return idx >= 0 ? idx : 0;
 	});
 
-	let mapContainer: HTMLDivElement | undefined = $state();
+	let mapEl: HTMLDivElement | undefined = $state();
 
 	$effect(() => {
-		if (!mapContainer) return;
-		const nodeId = `lesson-node-${currentLessonIndex}`;
-		const el = mapContainer.querySelector(`#${nodeId}`);
-		if (el) {
-			el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-		}
+		if (!mapEl) return;
+		const el = mapEl.querySelector(`#ln-${currentIdx}`);
+		if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
 	});
 
-	// Total Spark Points earned
-	let sparksEarned = $derived(
-		progress.filter((p) => p.puzzleEarned === 1).length
-	);
+	let sparksEarned = $derived(progress.filter((p) => p.puzzleEarned === 1).length);
 </script>
 
-<div class="lesson-map" bind:this={mapContainer}>
-	<!-- Spark Points link -->
-	<a href="/puzzle" class="spark-badge">
-		<SparkCoin size={28} />
-		<span class="spark-count">{sparksEarned}/7</span>
+<div class="map-wrap" bind:this={mapEl}>
+	<a href="/puzzle" class="spark-pill">
+		<SparkCoin size={22} />
+		<span class="spark-pill-val">{sparksEarned}/7</span>
 	</a>
 
-	<!-- Main SVG map -->
 	<svg
-		viewBox="0 0 {SVG_WIDTH} {svgHeight}"
+		viewBox="0 0 {SVG_WIDTH} {svgH}"
 		width={SVG_WIDTH}
-		height={svgHeight}
-		class="mx-auto block"
+		height={svgH}
+		class="map-svg"
 		role="img"
 		aria-label="Lesson progression map"
 	>
-		<!-- Dotted path -->
-		<path
-			d={pathD}
-			fill="none"
-			stroke="var(--color-surface-raised)"
-			stroke-width="4"
-			stroke-dasharray="8 6"
-			stroke-linecap="round"
-		/>
+		<defs>
+			<filter id="node-glow" x="-50%" y="-50%" width="200%" height="200%">
+				<feGaussianBlur in="SourceGraphic" stdDeviation="6" />
+			</filter>
+			<linearGradient id="path-grad" x1="0" y1="1" x2="0" y2="0">
+				<stop offset="0%" stop-color="var(--color-success)" />
+				<stop offset="100%" stop-color="var(--color-primary)" />
+			</linearGradient>
+		</defs>
 
-		<!-- Completed portion of the path -->
-		<path
-			d={pathD}
-			fill="none"
-			stroke="var(--color-success)"
-			stroke-width="4"
-			stroke-dasharray="8 6"
-			stroke-linecap="round"
-			class="path-completed"
-			style="--completed-nodes: {lessons.filter((l) => getStatus(l.id) === 'complete').length}; --total-nodes: {lessons.length}"
-		/>
+		<!-- Background path — thick, dotted -->
+		<path d={pathD} fill="none" stroke="var(--color-surface-sunken)" stroke-width="8" stroke-dasharray="1 16" stroke-linecap="round" />
 
-		<!-- Lesson nodes -->
+		<!-- Completed path overlay -->
+		<path d={pathD} fill="none" stroke="url(#path-grad)" stroke-width="8" stroke-dasharray="1 16" stroke-linecap="round" class="path-done" style="--done: {lessons.filter((l) => status(l.id) === 'complete').length}; --total: {lessons.length}" />
+
 		{#each lessons as lesson, i (lesson.id)}
-			{@const x = getNodeX(i)}
-			{@const y = getNodeY(i)}
-			{@const status = getStatus(lesson.id)}
-			{@const href = getLessonHref(lesson)}
-			{@const isActive = status !== 'locked'}
-			{@const isComplete = status === 'complete'}
-			{@const isInProgress = status === 'podcast_complete' || status === 'comprehension_complete'}
-			{@const isAvailable = status === 'available'}
+			{@const x = nx(i)}
+			{@const y = ny(i)}
+			{@const st = status(lesson.id)}
+			{@const lhref = href(lesson)}
+			{@const active = st !== 'locked'}
+			{@const done = st === 'complete'}
+			{@const current = st === 'available' || st === 'podcast_complete' || st === 'comprehension_complete'}
 
-			<g id="lesson-node-{i}">
-				{#if href}
-					<a href={href} class="lesson-node-link">
-						<!-- Glow ring for available lessons -->
-						{#if isAvailable}
-							<circle
-								cx={x}
-								cy={y}
-								r={NODE_RADIUS + 6}
-								class="node-glow"
-							/>
+			<g id="ln-{i}" class="node-g" style="--delay: {i * 0.06}s">
+				{#if lhref}
+					<a href={lhref} class="node-link">
+						<!-- Glow behind current node -->
+						{#if current}
+							<circle cx={x} cy={y} r={NODE_R + 12} fill="var(--color-primary)" filter="url(#node-glow)" class="node-glow-ring" />
 						{/if}
 
-						<!-- Node circle -->
-						<circle
-							cx={x}
-							cy={y}
-							r={NODE_RADIUS}
-							class="node-circle"
-							class:node-locked={!isActive}
-							class:node-available={isAvailable}
-							class:node-in-progress={isInProgress}
-							class:node-complete={isComplete}
-						/>
+						<!-- 3D shadow ellipse -->
+						{#if active}
+							<ellipse cx={x} cy={y + 4} rx={NODE_R} ry={NODE_R * 0.92}
+								fill={done ? 'var(--color-success-dark)' : 'var(--color-primary-dark)'}
+								opacity="0.6" />
+						{/if}
 
-						<!-- Part number -->
-						{#if isComplete}
-							<path
-								d="M {x - 8} {y} L {x - 2} {y + 6} L {x + 10} {y - 6}"
-								fill="none"
-								stroke="white"
-								stroke-width="3"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-							/>
+						<!-- Main node -->
+						<circle cx={x} cy={y} r={NODE_R}
+							class="node-fill"
+							class:node-locked={!active}
+							class:node-active={current}
+							class:node-done={done} />
+
+						<!-- Subtle inner highlight -->
+						{#if active && !done}
+							<ellipse cx={x} cy={y - 6} rx={NODE_R * 0.6} ry={NODE_R * 0.28}
+								fill="white" opacity="0.18" />
+						{/if}
+
+						<!-- Icon -->
+						{#if done}
+							<path d="M {x - 10} {y} L {x - 3} {y + 8} L {x + 12} {y - 8}"
+								fill="none" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
 						{:else}
-							<text
-								x={x}
-								y={y + 1}
-								text-anchor="middle"
-								dominant-baseline="central"
-								class="node-text"
-								class:node-text-locked={!isActive}
-								class:node-text-active={isActive}
-							>
+							<text x={x} y={y + 1} text-anchor="middle" dominant-baseline="central"
+								class="node-num" class:node-num-active={active} class:node-num-locked={!active}>
 								{lesson.partNumber}
 							</text>
 						{/if}
 
-						<!-- Title label -->
-						<text
-							x={getTitleX(x)}
-							y={splitTitle(lesson.title).length > 1 ? y - 7 : y + 1}
-							text-anchor={getTitleAnchor(x)}
-							dominant-baseline="central"
-							class="node-title"
-							class:node-title-locked={!isActive}
-						>
+						<!-- Title -->
+						<text x={titleX(x)} y={splitTitle(lesson.title).length > 1 ? y - 9 : y + 1}
+							text-anchor={titleAnchor(x)} dominant-baseline="central"
+							class="node-label" class:node-label-active={active} class:node-label-locked={!active}>
 							{#each splitTitle(lesson.title) as line, li (li)}
-								{#if li === 0}
-									{line}
-								{:else}
-									<tspan x={getTitleX(x)} dy="16">{line}</tspan>
-								{/if}
+								{#if li === 0}{line}{:else}<tspan x={titleX(x)} dy="18">{line}</tspan>{/if}
 							{/each}
 						</text>
+
+						<!-- "START" badge -->
+						{#if st === 'available'}
+							<g class="start-badge">
+								<rect x={x - 26} y={y + NODE_R + 8} width="52" height="22" rx="11"
+									fill="var(--color-primary)" />
+								<rect x={x - 26} y={y + NODE_R + 8 + 18} width="52" height="4" rx="0 0 11 11"
+									fill="var(--color-primary-dark)" opacity="0.7" />
+								<text x={x} y={y + NODE_R + 20} text-anchor="middle" dominant-baseline="central"
+									class="start-text">START</text>
+							</g>
+						{/if}
 					</a>
 				{:else}
-					<!-- Locked node - no link -->
-					<circle
-						cx={x}
-						cy={y}
-						r={NODE_RADIUS}
-						class="node-circle node-locked"
-					/>
-					<text
-						x={x}
-						y={y + 1}
-						text-anchor="middle"
-						dominant-baseline="central"
-						class="node-text node-text-locked"
-					>
-						{lesson.partNumber}
-					</text>
-					<text
-						x={getTitleX(x)}
-						y={splitTitle(lesson.title).length > 1 ? y - 7 : y + 1}
-						text-anchor={getTitleAnchor(x)}
-						dominant-baseline="central"
-						class="node-title node-title-locked"
-					>
+					<!-- Locked -->
+					<circle cx={x} cy={y} r={NODE_R} class="node-fill node-locked" />
+					<svg x={x - 9} y={y - 10} width="18" height="20" viewBox="0 0 18 20" fill="none">
+						<rect x="1" y="8" width="16" height="11" rx="2.5" fill="var(--color-text-muted)" opacity="0.25"/>
+						<path d="M4.5 8V6a4.5 4.5 0 1 1 9 0v2" stroke="var(--color-text-muted)" stroke-width="1.8" stroke-linecap="round" opacity="0.25"/>
+						<circle cx="9" cy="14" r="1.5" fill="var(--color-text-muted)" opacity="0.2"/>
+					</svg>
+					<text x={titleX(x)} y={splitTitle(lesson.title).length > 1 ? y - 9 : y + 1}
+						text-anchor={titleAnchor(x)} dominant-baseline="central"
+						class="node-label node-label-locked">
 						{#each splitTitle(lesson.title) as line, li (li)}
-							{#if li === 0}
-								{line}
-							{:else}
-								<tspan x={getTitleX(x)} dy="16">{line}</tspan>
-							{/if}
+							{#if li === 0}{line}{:else}<tspan x={titleX(x)} dy="18">{line}</tspan>{/if}
 						{/each}
 					</text>
 				{/if}
@@ -280,15 +208,18 @@
 </div>
 
 <style>
-	.lesson-map {
+	.map-wrap {
 		position: relative;
 		overflow-y: auto;
 		overflow-x: hidden;
-		max-height: 80vh;
+		max-height: 82vh;
 		padding: 1rem 0;
 	}
 
-	.spark-badge {
+	.map-svg { display: block; margin: 0 auto; }
+
+	/* ── Spark pill ── */
+	.spark-pill {
 		position: sticky;
 		top: 0.5rem;
 		float: right;
@@ -297,124 +228,87 @@
 		align-items: center;
 		gap: 0.375rem;
 		background: var(--color-surface);
-		border: 1px solid var(--color-surface-raised);
-		border-radius: 9999px;
+		border: 2px solid var(--color-border);
+		border-bottom-width: 3px;
+		border-bottom-color: var(--color-border-strong);
+		border-radius: var(--radius-full);
 		padding: 0.375rem 0.75rem;
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 		text-decoration: none;
-		transition: box-shadow 0.2s, transform 0.15s;
+		transition: transform 0.15s var(--ease-spring);
 		margin-right: 0.5rem;
 	}
+	.spark-pill:hover { transform: translateY(-2px); }
+	.spark-pill:active { transform: translateY(1px); }
+	.spark-pill-val { font-size: 0.8125rem; font-weight: 800; color: var(--color-text); }
 
-	.spark-badge:hover {
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-		transform: scale(1.05);
-	}
-
-	.spark-count {
-		font-size: 0.8rem;
-		font-weight: 700;
-		color: var(--color-text);
-	}
-
-	/* Path */
-	.path-completed {
-		stroke-dashoffset: 0;
-	}
-
-	/* Node styling */
-	.node-circle {
-		transition: fill 0.3s, stroke 0.3s, opacity 0.3s;
-	}
+	/* ── Nodes ── */
+	.node-fill { transition: fill 0.3s ease; }
 
 	.node-locked {
 		fill: var(--color-surface-raised);
-		stroke: var(--color-text-muted);
-		stroke-width: 2;
-		opacity: 0.5;
-	}
-
-	.node-available {
-		fill: var(--color-surface);
-		stroke: var(--color-primary);
+		stroke: var(--color-border-strong);
 		stroke-width: 3;
 	}
 
-	.node-in-progress {
-		fill: var(--color-primary-light);
-		stroke: var(--color-primary);
-		stroke-width: 3;
-	}
-
-	.node-complete {
-		fill: var(--color-success);
-		stroke: var(--color-success);
-		stroke-width: 2;
-	}
-
-	/* Glow animation for available nodes */
-	.node-glow {
-		fill: none;
-		stroke: var(--color-primary);
-		stroke-width: 2;
-		opacity: 0;
-		animation: pulse-glow 2s ease-in-out infinite;
-	}
-
-	@keyframes pulse-glow {
-		0%,
-		100% {
-			opacity: 0;
-			r: 30;
-		}
-		50% {
-			opacity: 0.4;
-			r: 34;
-		}
-	}
-
-	/* Node text */
-	.node-text {
-		font-size: 14px;
-		font-weight: 700;
-		pointer-events: none;
-	}
-
-	.node-text-locked {
-		fill: var(--color-text-muted);
-	}
-
-	.node-text-active {
+	.node-active {
 		fill: var(--color-primary);
 	}
 
-	.node-title {
-		font-size: 13px;
-		font-weight: 500;
-		fill: var(--color-text);
+	.node-done {
+		fill: var(--color-success);
+	}
+
+	/* ── Glow ── */
+	.node-glow-ring {
+		opacity: 0;
+		animation: glow-breathe 2.4s ease-in-out infinite;
+	}
+
+	@keyframes glow-breathe {
+		0%, 100% { opacity: 0; }
+		50% { opacity: 0.35; }
+	}
+
+	/* ── Numbers / labels ── */
+	.node-num {
+		font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+		font-size: 17px;
+		font-weight: 800;
+		pointer-events: none;
+	}
+	.node-num-active { fill: white; }
+	.node-num-locked { fill: var(--color-text-muted); }
+
+	.node-label {
+		font-family: 'Outfit', system-ui, sans-serif;
+		font-size: 12.5px;
+		font-weight: 700;
+		pointer-events: none;
+		transition: fill 0.3s ease;
+	}
+	.node-label-active { fill: var(--color-text); }
+	.node-label-locked { fill: var(--color-text-subtle); }
+
+	.start-text {
+		font-family: 'Outfit', system-ui, sans-serif;
+		font-size: 9px;
+		font-weight: 800;
+		fill: white;
+		letter-spacing: 0.1em;
 		pointer-events: none;
 	}
 
-	.node-title-locked {
-		fill: var(--color-text-muted);
-		opacity: 0.6;
+	.start-badge { animation: badge-bounce 2s ease-in-out infinite; }
+
+	@keyframes badge-bounce {
+		0%, 100% { transform: translateY(0); }
+		50% { transform: translateY(-3px); }
 	}
 
-	/* Link styling */
-	.lesson-node-link {
-		cursor: pointer;
-	}
-
-	.lesson-node-link:hover .node-circle:not(.node-complete) {
-		filter: brightness(1.1);
-	}
-
-	.lesson-node-link:focus-visible {
-		outline: none;
-	}
-
-	.lesson-node-link:focus-visible .node-circle {
-		stroke: var(--color-accent);
-		stroke-width: 3;
-	}
+	/* ── Hover ── */
+	.node-link { cursor: pointer; }
+	.node-link:hover .node-fill:not(.node-done):not(.node-locked) { filter: brightness(1.15); }
+	.node-link:active .node-fill:not(.node-locked) { filter: brightness(0.92); }
+	.node-link:focus-visible { outline: none; }
+	.node-link:focus-visible .node-fill { stroke: var(--color-accent); stroke-width: 4; }
 </style>

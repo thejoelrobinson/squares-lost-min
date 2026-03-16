@@ -6,12 +6,17 @@ export const users = sqliteTable('users', {
 		.primaryKey()
 		.$defaultFn(() => ulid()),
 	name: text('name').notNull(),
+	lastName: text('last_name').notNull().default(''),
 	role: text('role').notNull(),
 	teamSize: integer('team_size').notNull(),
 	feedbackFrequency: text('feedback_frequency').notNull(),
 	comfortLevel: integer('comfort_level').notNull(),
 	challenges: text('challenges').notNull(), // JSON array
 	scenario: text('scenario'),
+	xp: integer('xp').notNull().default(0),
+	currentStreak: integer('current_streak').notNull().default(0),
+	longestStreak: integer('longest_streak').notNull().default(0),
+	lastActiveDate: text('last_active_date'),
 	createdAt: integer('created_at', { mode: 'timestamp' })
 		.notNull()
 		.$defaultFn(() => new Date()),

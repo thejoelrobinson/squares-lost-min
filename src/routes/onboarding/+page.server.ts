@@ -2,22 +2,27 @@ import type { Actions, PageServerLoad } from './$types';
 import { redirect } from '@sveltejs/kit';
 import {
 	createUser,
+	updateUser,
+	getUserById,
 	getAllLessons,
-	createLessonProgress
+	createLessonProgress,
+	getProgressForUser
 } from '$lib/server/db/queries';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	// Redirect to home if user already exists
-	if (locals.userId) throw redirect(303, '/');
-	return {};
+	let existingUser = null;
+	if (locals.userId) {
+		existingUser = await getUserById(locals.userId);
+	}
+	return { existingUser };
 };
 
 export const actions: Actions = {
-	default: async ({ request }) => {
+	default: async ({ request, locals }) => {
 		const formData = await request.formData();
 
-		// Extract all fields from the multi-step form
-		const name = formData.get('name') as string;
+		const firstName = formData.get('firstName') as string;
+		const lastName = formData.get('lastName') as string;
 		const role = formData.get('role') as string;
 		const teamSize = parseInt(formData.get('teamSize') as string) || 1;
 		const feedbackFrequency = formData.get('feedbackFrequency') as string;
@@ -25,22 +30,34 @@ export const actions: Actions = {
 		const challenges = formData.getAll('challenges') as string[];
 		const scenario = (formData.get('scenario') as string) || null;
 
-		// Create the user
-		const user = await createUser({
-			name,
+		const userData = {
+			name: firstName,
+			lastName,
 			role,
 			teamSize,
 			feedbackFrequency,
 			comfortLevel,
 			challenges: JSON.stringify(challenges),
 			scenario
-		});
+		};
 
-		// Get all lessons and create initial progress
+		// Existing user: update profile and redirect
+		if (locals.userId) {
+			await updateUser(locals.userId, userData);
+			const existingProgress = await getProgressForUser(locals.userId);
+			if (existingProgress.length > 0) {
+				throw redirect(303, '/');
+			}
+		}
+
+		// New user: create and initialize progress
+		const user = locals.userId
+			? (await getUserById(locals.userId))!
+			: await createUser(userData);
+
 		const lessons = await getAllLessons();
 		for (const lesson of lessons) {
 			if (lesson.partNumber === 1) {
-				// Onboarding is now complete
 				await createLessonProgress({
 					userId: user.id,
 					lessonId: lesson.id,
@@ -48,14 +65,12 @@ export const actions: Actions = {
 					puzzleEarned: false
 				});
 			} else if (lesson.partNumber === 2) {
-				// First real lesson is available
 				await createLessonProgress({
 					userId: user.id,
 					lessonId: lesson.id,
 					status: 'available'
 				});
 			} else {
-				// Rest are locked
 				await createLessonProgress({
 					userId: user.id,
 					lessonId: lesson.id,
