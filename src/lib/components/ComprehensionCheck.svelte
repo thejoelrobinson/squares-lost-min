@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { QuizQuestion } from '$lib/types';
+	import type { QuizQuestion, StructuredFeedback } from '$lib/types';
 	import Button from '$lib/components/Button.svelte';
 	import QuizContainer from '$lib/components/quiz/QuizContainer.svelte';
 	import VoiceChat from '$lib/components/VoiceChat.svelte';
@@ -18,40 +18,44 @@
 		quiz: QuizQuestion[];
 		scenarioBriefing?: string;
 		hasRoleplay?: boolean;
-		onComplete: (score: number, hearts: number) => void;
+		onComplete: (score: number, hearts: number, feedback?: StructuredFeedback) => void;
 	} = $props();
 
-	function handleVoiceComplete(score: number) {
-		onComplete(score, 3);
+	function handleVoiceComplete(score: number, feedback?: StructuredFeedback) {
+		onComplete(score, 3, feedback);
 	}
-
-	// svelte-ignore state_referenced_locally
-	const _hasBriefing = !!scenarioBriefing;
 
 	// For test lessons with roleplay: quiz phase → roleplay phase
 	let testPhase = $state<'quiz' | 'briefing' | 'roleplay'>('quiz');
 	let quizScore = $state(0);
 	let quizHearts = $state(3);
 	let scenarioCollapsed = $state(false);
-	let mode = $state<'quiz' | 'voice' | 'text'>(_hasBriefing ? 'text' : 'quiz');
+	// svelte-ignore state_referenced_locally
+	let mode = $state<'quiz' | 'voice' | 'text'>(hasRoleplay ? 'text' : 'quiz');
 
-	function handleQuizCompleteForTest(score: number, hearts: number) {
+	function handleQuizCompleteForTest(score: number, hearts: number, _feedback?: StructuredFeedback) {
 		quizScore = score;
 		quizHearts = hearts;
 		testPhase = 'briefing';
 	}
 
-	function handleRoleplayComplete(score: number) {
+	function handleRoleplayComplete(score: number, feedback?: StructuredFeedback) {
 		// Weighted average: 40% quiz, 60% roleplay
 		const combinedScore = quizScore * 0.4 + score * 0.6;
-		onComplete(combinedScore, quizHearts);
+		onComplete(combinedScore, quizHearts, feedback);
 	}
 
+	// Pre-parse scenario briefing markdown into segments (avoids re-parsing on every render)
 	type Segment = { text: string; bold: boolean };
 	function parseInline(text: string): Segment[] {
 		const parts = text.split(/\*\*(.*?)\*\*/g);
 		return parts.map((part, i) => ({ text: part, bold: i % 2 === 1 })).filter((s) => s.text);
 	}
+	let briefingParagraphs = $derived(
+		scenarioBriefing
+			? scenarioBriefing.split('\n\n').map((p) => parseInline(p))
+			: []
+	);
 </script>
 
 <div class="comp-check">
@@ -67,7 +71,7 @@
 				<p class="comp-subtitle">Show what you learned</p>
 			{/if}
 		</div>
-		{#if !_hasBriefing}<div class="comp-mode-toggle">
+		{#if !hasRoleplay}<div class="comp-mode-toggle">
 			<button
 				type="button"
 				class="mode-btn"
@@ -114,9 +118,9 @@
 			<div class="scenario-briefing">
 				<div class="scenario-badge">Scenario</div>
 				<div class="scenario-text">
-					{#each scenarioBriefing.split('\n\n') as paragraph, i (i)}
+					{#each briefingParagraphs as segs, i (i)}
 						<p>
-							{#each parseInline(paragraph) as seg, j (j)}
+							{#each segs as seg, j (j)}
 								{#if seg.bold}<strong>{seg.text}</strong>{:else}{seg.text}{/if}
 							{/each}
 						</p>
@@ -149,9 +153,9 @@
 					</div>
 					{#if !scenarioCollapsed}
 						<div class="scenario-text scenario-text--sm">
-							{#each scenarioBriefing.split('\n\n') as paragraph, i (i)}
+							{#each briefingParagraphs as segs, i (i)}
 								<p>
-									{#each parseInline(paragraph) as seg, j (j)}
+									{#each segs as seg, j (j)}
 										{#if seg.bold}<strong>{seg.text}</strong>{:else}{seg.text}{/if}
 									{/each}
 								</p>

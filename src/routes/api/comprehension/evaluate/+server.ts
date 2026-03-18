@@ -36,7 +36,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	const content = getLessonContent(lesson.slug);
 	const objectives = content?.scenarioEvaluationObjectives ?? content?.objectives ?? [`Understand the key concepts of "${lesson.title}"`];
 
-	const result = await evaluateComprehension({
+	const feedback = await evaluateComprehension({
 		lessonTitle: lesson.title,
 		lessonObjectives: objectives,
 		userRole: user.role,
@@ -45,5 +45,5 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		transcript
 	});
 
-	return json(result);
+	return json(feedback);
 };

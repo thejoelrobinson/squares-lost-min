@@ -17,8 +17,6 @@ const DEV_REPLIES = [
 	"Thanks for the feedback, boss. I really appreciate you being direct with me. I'll work on being more aware of when to step back during Q&A, and I'm glad the backup slides paid off. [DONE]"
 ];
 
-let devReplyIndex = 0;
-
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.userId) {
 		error(401, 'Not authenticated');
@@ -55,8 +53,9 @@ async function handleMessage(
 	}
 
 	if (!env.OPENROUTER_API_KEY) {
-		const reply = DEV_REPLIES[devReplyIndex % DEV_REPLIES.length];
-		devReplyIndex++;
+		// Use conversation turn count to pick the next dev reply
+		const turnIndex = Math.floor(history.length / 2);
+		const reply = DEV_REPLIES[Math.min(turnIndex, DEV_REPLIES.length - 1)];
 		const done = reply.includes('[DONE]');
 		return json({ reply: reply.replace('[DONE]', '').trim(), done });
 	}
@@ -110,7 +109,7 @@ async function handleEvaluate(
 	const content = lessonContent[lessonSlug];
 	const objectives = content?.scenarioEvaluationObjectives ?? content?.objectives ?? [];
 
-	const result = await evaluateComprehension({
+	const feedback = await evaluateComprehension({
 		lessonTitle: lesson.title,
 		lessonObjectives: objectives,
 		userRole: user.role,
@@ -119,9 +118,5 @@ async function handleEvaluate(
 		transcript
 	});
 
-	return json({
-		score: result.confidence,
-		gaps: result.gaps,
-		summary: result.summary
-	});
+	return json(feedback);
 }

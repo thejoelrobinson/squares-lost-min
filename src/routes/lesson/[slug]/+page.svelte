@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import type { StructuredFeedback } from '$lib/types';
 	import ProgressBar from '$lib/components/ProgressBar.svelte';
 	import PodcastPlayer from '$lib/components/PodcastPlayer.svelte';
 	import ArticleReader from '$lib/components/ArticleReader.svelte';
@@ -28,6 +29,7 @@
 	let quizCorrect = $state(0);
 	let quizTotal = $state(0);
 	let quizHearts = $state(3);
+	let comprehensionFeedback = $state<StructuredFeedback | undefined>();
 
 	let earnedCount = $derived(
 		data.allProgress.filter((p) => p.lesson_progress.puzzleEarned).length + 1
@@ -69,12 +71,13 @@
 		phaseOverride = 'comprehension';
 	}
 
-	async function onComprehensionComplete(score: number, hearts: number) {
+	async function onComprehensionComplete(score: number, hearts: number, feedback?: StructuredFeedback) {
 		const questions = content?.quiz ?? [];
 		quizAccuracy = score;
 		quizTotal = questions.length;
 		quizCorrect = Math.round(score * questions.length);
 		quizHearts = hearts;
+		comprehensionFeedback = feedback;
 		await updateProgress('comprehension_complete');
 		phaseOverride = 'celebration';
 	}
@@ -181,6 +184,7 @@
 			heartsTotal={3}
 			onContinue={onCelebrationContinue}
 			nextLessonTitle={nextLessonTitle()}
+			feedback={comprehensionFeedback}
 		/>
 	{:else if phase === 'reward'}
 		<PuzzleReward

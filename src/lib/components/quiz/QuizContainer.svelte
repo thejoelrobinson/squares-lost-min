@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { QuizQuestion } from '$lib/types';
+	import type { QuizQuestion, StructuredFeedback } from '$lib/types';
 	import Button from '$lib/components/Button.svelte';
 	import Card from '$lib/components/Card.svelte';
 	import HeartIndicator from '$lib/components/HeartIndicator.svelte';
@@ -27,7 +27,7 @@
 	}: {
 		questions: QuizQuestion[];
 		lessonSlug?: string;
-		onComplete: (score: number, hearts: number) => void;
+		onComplete: (score: number, hearts: number, feedback?: StructuredFeedback) => void;
 	} = $props();
 
 	let quote = $derived(lessonSlug ? samQuotes[lessonSlug] ?? null : null);
@@ -53,6 +53,7 @@
 	let xpPopup = $state<{ amount: number; key: number } | null>(null);
 	let xpKey = $state(0);
 	let answerTimeout: ReturnType<typeof setTimeout> | null = null;
+	let freeformFeedbacks = $state<StructuredFeedback[]>([]);
 
 	onDestroy(() => {
 		if (answerTimeout) clearTimeout(answerTimeout);
@@ -68,6 +69,7 @@
 		showCorrectBurst = false;
 		showCheckmark = false;
 		resultsRevealed = false;
+		freeformFeedbacks = [];
 	}
 
 	$effect(() => {
@@ -98,6 +100,13 @@
 	});
 
 	let passed = $derived(totalScore >= PASS_THRESHOLD && !outOfHearts);
+
+	function handleFreeformAnswer(score: number, feedback?: StructuredFeedback) {
+		if (feedback) {
+			freeformFeedbacks = [...freeformFeedbacks, feedback];
+		}
+		handleAnswer(score);
+	}
 
 	function handleAnswer(score: number) {
 		queueScores[currentQueuePos] = score;
@@ -159,7 +168,18 @@
 				}).catch(() => {});
 			}
 		}
-		onComplete(totalScore, hearts);
+
+		let mergedFeedback: StructuredFeedback | undefined;
+		if (freeformFeedbacks.length > 0) {
+			mergedFeedback = {
+				score: totalScore,
+				summary: freeformFeedbacks.map((f) => f.summary).filter(Boolean).join(' '),
+				objectiveAssessments: freeformFeedbacks.flatMap((f) => f.objectiveAssessments),
+				strengths: freeformFeedbacks.flatMap((f) => f.strengths),
+				nextSteps: freeformFeedbacks.flatMap((f) => f.nextSteps)
+			};
+		}
+		onComplete(totalScore, hearts, mergedFeedback);
 	}
 
 	$effect(() => {
@@ -230,7 +250,7 @@
 						<FreeformResponse
 							question={currentQuestion.question}
 							evaluationHint={currentQuestion.evaluationHint ?? ''}
-							onAnswer={handleAnswer}
+							onAnswer={handleFreeformAnswer}
 						/>
 					{:else if currentQuestion.type === 'fill-in-the-blank'}
 						<FillInTheBlank

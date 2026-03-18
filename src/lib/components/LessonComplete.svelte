@@ -1,5 +1,7 @@
 <script lang="ts">
+	import type { StructuredFeedback } from '$lib/types';
 	import Button from '$lib/components/Button.svelte';
+	import FeedbackPanel from '$lib/components/FeedbackPanel.svelte';
 	import SparkCoin from '$lib/components/SparkCoin.svelte';
 	import SoundEffects from '$lib/utils/soundEffects';
 
@@ -12,6 +14,7 @@
 		heartsTotal: number;
 		onContinue: () => void;
 		nextLessonTitle?: string;
+		feedback?: StructuredFeedback;
 	}
 
 	let {
@@ -22,12 +25,14 @@
 		heartsRemaining,
 		heartsTotal,
 		onContinue,
-		nextLessonTitle
+		nextLessonTitle,
+		feedback
 	}: Props = $props();
 
 	let mounted = $state(false);
 	let barFilled = $state(false);
 	let statsVisible = $state(false);
+	let feedbackVisible = $state(false);
 	let ctaVisible = $state(false);
 
 	$effect(() => {
@@ -37,12 +42,14 @@
 		});
 		const t2 = setTimeout(() => { barFilled = true; }, 500);
 		const t3 = setTimeout(() => { statsVisible = true; }, 1100);
-		const t4 = setTimeout(() => { ctaVisible = true; }, 1300);
+		const t4 = setTimeout(() => { feedbackVisible = true; }, 1400);
+		const t5 = setTimeout(() => { ctaVisible = true; }, feedback ? 1600 : 1300);
 		return () => {
 			cancelAnimationFrame(t1);
 			clearTimeout(t2);
 			clearTimeout(t3);
 			clearTimeout(t4);
+			clearTimeout(t5);
 		};
 	});
 </script>
@@ -99,6 +106,12 @@
 			<span class="stat-tag">Hearts</span>
 		</div>
 	</div>
+
+	{#if feedback && feedbackVisible}
+		<div class="cel-feedback" class:cel-feedback-in={feedbackVisible}>
+			<FeedbackPanel {feedback} />
+		</div>
+	{/if}
 
 	<div class="cel-cta" class:cel-cta-in={ctaVisible}>
 		<Button onclick={onContinue} size="lg" variant="cta" fullWidth>Claim Spark Point</Button>
@@ -274,6 +287,16 @@
 
 	.stat-heart { display: inline-block; }
 	.stat-heart-gone { opacity: 0.25; }
+
+	/* ── Feedback ── */
+	.cel-feedback {
+		width: 100%;
+		max-width: 24rem;
+		opacity: 0;
+		transform: translateY(10px);
+		transition: opacity 0.4s ease, transform 0.5s var(--ease-bounce);
+	}
+	.cel-feedback-in { opacity: 1; transform: translateY(0); }
 
 	/* ── CTA ── */
 	.cel-cta {

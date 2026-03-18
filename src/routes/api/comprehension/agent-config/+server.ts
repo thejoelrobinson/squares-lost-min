@@ -52,6 +52,8 @@ ${evalList}`;
 		transcriptContext = `MODE: COMPREHENSION CHECK — Assess the learner's understanding through Socratic dialogue. Do not re-teach; probe what they retained.\n\nLesson objectives to assess:\n${objectivesList}\n\nKeep the check to 3-5 exchanges. When satisfied they understand, wrap up naturally.`;
 	}
 
+	const agentMode = content?.jamieSystemPrompt ? 'scenario' as const : 'comprehension' as const;
+
 	const config = buildAgentConfig(
 		{ title: lesson.title, slug: lesson.slug },
 		{
@@ -61,6 +63,7 @@ ${evalList}`;
 			comfortLevel: user.comfortLevel
 		},
 		transcriptContext,
+		agentMode,
 		scenarioGreeting
 	);
 

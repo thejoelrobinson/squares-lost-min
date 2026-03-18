@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { StructuredFeedback } from '$lib/types';
 	import Button from '$lib/components/Button.svelte';
 
 	let {
@@ -8,13 +9,13 @@
 	}: {
 		question: string;
 		evaluationHint: string;
-		onAnswer: (score: number) => void;
+		onAnswer: (score: number, feedback?: StructuredFeedback) => void;
 	} = $props();
 
 	let response = $state('');
 	let submitted = $state(false);
 	let loading = $state(false);
-	let feedback = $state('');
+	let feedbackData = $state<StructuredFeedback | undefined>();
 	let score = $state<number | null>(null);
 
 	async function submit() {
@@ -36,14 +37,13 @@
 				throw new Error('Evaluation failed');
 			}
 
-			const data = await res.json();
+			const data: StructuredFeedback = await res.json();
 			const evaluatedScore: number = data.score ?? 0.5;
 			score = evaluatedScore;
-			feedback = data.feedback ?? 'Response evaluated.';
+			feedbackData = data;
 			submitted = true;
-			onAnswer(evaluatedScore);
+			onAnswer(evaluatedScore, data);
 		} catch {
-			feedback = 'Unable to evaluate response. Your answer has been recorded.';
 			score = 0.5;
 			submitted = true;
 			onAnswer(0.5);
@@ -81,8 +81,19 @@
 				<p class={score >= 0.6 ? 'text-success font-medium' : 'text-error font-medium'}>
 					Score: {Math.round(score * 100)}%
 				</p>
-				{#if feedback}
-					<p class="mt-2 text-text-muted">{feedback}</p>
+				{#if feedbackData}
+					{#if feedbackData.objectiveAssessments.length > 0}
+						{@const assessment = feedbackData.objectiveAssessments[0]}
+						<p class="mt-2 text-text-muted">{assessment.feedback}</p>
+					{:else if feedbackData.summary}
+						<p class="mt-2 text-text-muted">{feedbackData.summary}</p>
+					{/if}
+					{#if feedbackData.nextSteps.length > 0 && score < 0.6}
+						<div class="mt-2 rounded-lg border border-accent/20 bg-accent/5 p-2">
+							<p class="text-xs font-semibold text-accent-dark">Try next:</p>
+							<p class="text-sm text-text">{feedbackData.nextSteps[0]}</p>
+						</div>
+					{/if}
 				{/if}
 			</div>
 		{/if}

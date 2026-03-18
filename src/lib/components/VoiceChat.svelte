@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { Conversation, type Mode } from '@11labs/client';
 	import type { DisconnectionDetails } from '@11labs/client';
+	import type { StructuredFeedback } from '$lib/types';
 	import Button from './Button.svelte';
 	import Card from './Card.svelte';
+	import FeedbackPanel from './FeedbackPanel.svelte';
 
 	let {
 		lessonId: _lessonId,
@@ -11,7 +13,7 @@
 	}: {
 		lessonId: string;
 		lessonSlug: string;
-		onComplete: (score: number) => void;
+		onComplete: (score: number, feedback?: StructuredFeedback) => void;
 	} = $props();
 
 	let status = $state<'idle' | 'connecting' | 'active' | 'processing' | 'done' | 'error'>('idle');
@@ -24,6 +26,7 @@
 	let mode = $state<Mode>('listening');
 	let conversation: Conversation | null = null;
 	let score = $state<number | null>(null);
+	let feedbackData = $state<StructuredFeedback | undefined>();
 
 	let isSpeaking = $derived(mode === 'speaking');
 
@@ -140,10 +143,10 @@
 			}
 
 			const result = await res.json();
-			const finalScore: number = result.confidence ?? result.score ?? 0;
+			const finalScore: number = result.score ?? 0;
 			score = finalScore;
+			feedbackData = result;
 			status = 'done';
-			onComplete(finalScore);
 		} catch (err) {
 			error =
 				err instanceof Error ? err.message : 'Failed to evaluate conversation';
@@ -301,6 +304,12 @@
 					Comprehension score: <span class="font-semibold text-text">{Math.round(score * 100)}%</span>
 				</p>
 			{/if}
+			{#if feedbackData}
+				<FeedbackPanel feedback={feedbackData} />
+			{/if}
+			<Button onclick={() => onComplete(score ?? 0, feedbackData)} variant="cta">
+				See Results
+			</Button>
 		</div>
 
 	{:else if status === 'error'}

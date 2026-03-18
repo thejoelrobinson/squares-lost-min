@@ -39,11 +39,18 @@ export interface UserProfile {
 	scenario: string | null;
 }
 
-export interface ComprehensionAssessment {
-	understood: boolean;
-	confidence: number;
-	gaps: string[];
+export interface ObjectiveAssessment {
+	objective: string;
+	met: boolean;
+	feedback: string;
+}
+
+export interface StructuredFeedback {
+	score: number;
 	summary: string;
+	objectiveAssessments: ObjectiveAssessment[];
+	strengths: string[];
+	nextSteps: string[];
 }
 
 export interface QuizQuestion {

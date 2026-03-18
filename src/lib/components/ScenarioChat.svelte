@@ -1,6 +1,8 @@
 <script lang="ts">
+	import type { StructuredFeedback } from '$lib/types';
 	import Button from '$lib/components/Button.svelte';
 	import Card from '$lib/components/Card.svelte';
+	import FeedbackPanel from '$lib/components/FeedbackPanel.svelte';
 	import { getLessonContent } from '$lib/content/lesson-data';
 
 	let {
@@ -8,31 +10,34 @@
 		onComplete
 	}: {
 		lessonSlug: string;
-		onComplete: (score: number) => void;
+		onComplete: (score: number, feedback?: StructuredFeedback) => void;
 	} = $props();
-
-	type ChatMessage = { role: 'user' | 'jamie'; text: string };
 
 	// svelte-ignore state_referenced_locally
 	const content = getLessonContent(lessonSlug);
 	const opener = content?.jamieOpener ?? "Hey, good morning! What did you want to talk about?";
 
 	let status = $state<'active' | 'waiting' | 'processing' | 'done' | 'error'>('active');
-	let messages = $state<ChatMessage[]>([{ role: 'jamie', text: opener }]);
 	let inputText = $state('');
 	let history = $state<Array<{ role: string; content: string }>>([
 		{ role: 'assistant', content: opener }
 	]);
 	let score = $state(0);
-	let gaps = $state<string[]>([]);
-	let summary = $state('');
+	let feedbackData = $state<StructuredFeedback | undefined>();
 	let errorMessage = $state('');
 	let chatArea: HTMLDivElement | undefined = $state();
+
+	// Derive display messages from the single source of truth (history)
+	let messages = $derived(
+		history.map((h) => ({
+			role: h.role === 'user' ? 'user' as const : 'jamie' as const,
+			text: h.content
+		}))
+	);
 
 	// Auto-scroll when messages change
 	$effect(() => {
 		if (messages.length > 0 && chatArea) {
-			// Use a microtask to ensure DOM has updated
 			queueMicrotask(() => {
 				chatArea?.scrollTo({ top: chatArea.scrollHeight, behavior: 'smooth' });
 			});
@@ -44,7 +49,6 @@
 		if (!text || status !== 'active') return;
 
 		inputText = '';
-		messages = [...messages, { role: 'user', text }];
 		history = [...history, { role: 'user', content: text }];
 		status = 'waiting';
 
@@ -56,7 +60,7 @@
 					action: 'message',
 					lessonSlug,
 					message: text,
-					history
+					history: history.slice(0, -1) // history before this message
 				})
 			});
 
@@ -65,7 +69,6 @@
 			}
 
 			const data = await res.json();
-			messages = [...messages, { role: 'jamie', text: data.reply }];
 			history = [...history, { role: 'assistant', content: data.reply }];
 
 			if (data.done) {
@@ -98,8 +101,7 @@
 
 			const data = await res.json();
 			score = data.score;
-			gaps = data.gaps ?? [];
-			summary = data.summary ?? '';
+			feedbackData = data;
 			status = 'done';
 		} catch (err) {
 			errorMessage = err instanceof Error ? err.message : 'Failed to evaluate';
@@ -115,7 +117,7 @@
 	}
 
 	function handleComplete() {
-		onComplete(score);
+		onComplete(score, feedbackData);
 	}
 </script>
 
@@ -180,18 +182,11 @@
 					<span class="chat-score-value">{Math.round(score * 100)}%</span>
 					<span class="chat-score-label">Feedback Score</span>
 				</div>
-				{#if summary}
-					<p class="chat-summary">{summary}</p>
-				{/if}
-				{#if gaps.length > 0}
-					<div class="chat-gaps">
-						<p class="chat-gaps-title">Areas to improve:</p>
-						<ul class="chat-gaps-list">
-							{#each gaps as gap, i (i)}
-								<li>{gap}</li>
-							{/each}
-						</ul>
-					</div>
+				{#if feedbackData}
+					{#if feedbackData.summary}
+						<p class="chat-summary">{feedbackData.summary}</p>
+					{/if}
+					<FeedbackPanel feedback={feedbackData} compact />
 				{/if}
 				<Button onclick={handleComplete} variant="cta" fullWidth>
 					See Results
@@ -404,24 +399,4 @@
 		text-align: center;
 	}
 
-	.chat-gaps {
-		background: var(--color-surface-raised);
-		border-radius: var(--radius-lg);
-		padding: 0.75rem 1rem;
-	}
-
-	.chat-gaps-title {
-		font-size: 0.75rem;
-		font-weight: 700;
-		color: var(--color-text-muted);
-		margin-bottom: 0.5rem;
-	}
-
-	.chat-gaps-list {
-		list-style: disc;
-		padding-left: 1.25rem;
-		font-size: 0.8125rem;
-		color: var(--color-text);
-		line-height: 1.6;
-	}
 </style>
