@@ -32,9 +32,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		error(404, 'Lesson not found');
 	}
 
-	// Use structured objectives from lesson-data.ts, falling back to generic title-based objectives
+	// Use scenario-specific objectives for roleplay lessons, then structured objectives, then fallback
 	const content = getLessonContent(lesson.slug);
-	const objectives = content?.objectives ?? [`Understand the key concepts of "${lesson.title}"`];
+	const objectives = content?.scenarioEvaluationObjectives ?? content?.objectives ?? [`Understand the key concepts of "${lesson.title}"`];
 
 	const result = await evaluateComprehension({
 		lessonTitle: lesson.title,

@@ -1,0 +1,73 @@
+---
+part: 4
+title: "The SBI Structural Model"
+slug: "timing-is-everything"
+readingTime: 3
+---
+
+## The SBI Structural Model: A Blueprint for Clear Feedback
+
+Knowing when to give feedback is only half the battle. The other half is knowing **how** to say it without the conversation going off the rails.
+
+Feedback can easily get clouded by raw emotion or misinterpretation. A well-intentioned conversation can quickly become a defensive argument. That is exactly why leaders need a structured approach — a blueprint.
+
+### What Is the SBI Model?
+
+The SBI feedback model is a simple, highly effective framework designed to make feedback significantly clearer. It keeps the conversation strictly focused on **observable facts**, rather than subjective assumptions or emotions.
+
+SBI stands for three components:
+
+1. **Situation** — the where and when
+2. **Behavior** — the what (observable actions only)
+3. **Impact** — the why it matters
+
+By relying on this strict structure, you reduce misinterpretation, drop the defensive shields, and pave the way for a productive, growth-focused dialogue.
+
+### S — Situation
+
+Define the exact context of what you are discussing. Anchor it in time and space.
+
+An **ineffective** start sounds like this:
+
+> "When dealing with customers, you always act..."
+
+This is too broad. Words like "always" immediately make people defensive because it feels like an attack on their character.
+
+An **effective** start sounds like this:
+
+> "In our team meeting on Tuesday..."
+
+You have established a factual setting. No one can argue with Tuesday's team meeting.
+
+### B — Behavior
+
+Describe the specific, observable behavior that occurred. What did you see or hear? Stick to the facts.
+
+Avoid assumptions like "you were being rude." Instead, describe the action:
+
+- Crossing arms during a presentation
+- Interrupting others mid-sentence
+- Returning late from lunch
+- Walking by a spill without taking action
+
+You are simply stating the action that took place within that specific situation.
+
+### I — Impact
+
+Clearly explain the impact that the behavior had — on you, the customer, or the business as a whole. This is the "why it matters" part of the conversation. Connect the action directly to the consequence.
+
+**For corrective feedback:**
+
+> "When ladders aren't secured, our customers are put at risk."
+
+**For positive reinforcement:**
+
+> "When you make space for others to finish their thoughts, it helps them feel heard and valued."
+
+### SBI Works Both Ways
+
+The SBI model is not just for corrective conversations. It works beautifully for positive reinforcement, too. Acknowledging good behavior with the same clarity and structure makes the praise feel genuine and specific — far more meaningful than a generic "good job."
+
+### The Transformation
+
+Situation. Behavior. Impact. Three simple components that take the guesswork and the emotion entirely out of the equation. What used to be a stressful confrontation becomes a clear, factual, and supportive conversation.

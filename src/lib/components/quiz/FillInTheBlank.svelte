@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Button from '$lib/components/Button.svelte';
 
-	let {
+	const {
 		question,
 		wordBank,
 		blanks,
@@ -14,7 +14,9 @@
 	} = $props();
 
 	// Component is keyed by currentIndex, so props don't change after mount
-	let answers = $state<(string | null)[]>(Array(blanks.length).fill(null));
+	// svelte-ignore state_referenced_locally
+	const _blankCount = blanks.length;
+	let answers = $state<(string | null)[]>(Array(_blankCount).fill(null));
 	let submitted = $state(false);
 	let draggedWord = $state<string | null>(null);
 	let dragOverBlankIndex = $state<number | null>(null);
@@ -85,18 +87,21 @@
 	let activeBlank = $state<number | null>(0);
 
 	// Parse the question into segments with blanks
+	// Supports both numbered (1. _____) and plain (___) blank formats
 	let segments = $derived.by(() => {
 		const parts: { text: string; blankIndex?: number }[] = [];
-		const regex = /(\d+)\.\s*_____/g;
+		const regex = /(?:(\d+)\.\s*_{3,}|_{3,})/g;
 		let lastIndex = 0;
+		let autoIndex = 0;
 		let match: RegExpExecArray | null;
 
 		while ((match = regex.exec(question)) !== null) {
 			if (match.index > lastIndex) {
 				parts.push({ text: question.slice(lastIndex, match.index) });
 			}
-			const blankNum = parseInt(match[1]) - 1;
+			const blankNum = match[1] ? parseInt(match[1]) - 1 : autoIndex;
 			parts.push({ text: '', blankIndex: blankNum });
+			autoIndex++;
 			lastIndex = match.index + match[0].length;
 		}
 		if (lastIndex < question.length) {

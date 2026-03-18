@@ -132,8 +132,10 @@
 
 	/* ── Top Nav ── */
 	.top-nav {
-		background: var(--color-surface);
-		border-bottom: 2px solid var(--color-border);
+		background: oklch(99% 0.003 280 / 0.78);
+		backdrop-filter: blur(24px) saturate(1.6);
+		-webkit-backdrop-filter: blur(24px) saturate(1.6);
+		border-bottom: 1px solid oklch(0% 0 0 / 0.05);
 		position: sticky;
 		top: 0;
 		z-index: 40;
@@ -145,7 +147,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: 0.625rem 1.25rem;
+		padding: 0.75rem 1.25rem;
 	}
 
 	/* ── Brand ── */
@@ -154,22 +156,22 @@
 		align-items: center;
 		gap: 0.625rem;
 		text-decoration: none;
-		transition: transform 0.2s var(--ease-spring);
+		transition: transform 0.2s var(--ease-smooth);
 	}
 
 	.nav-brand:hover { transform: scale(1.02); }
 	.nav-brand:active { transform: scale(0.98); }
 
 	.brand-mark {
-		width: 2.125rem;
-		height: 2.125rem;
+		width: 2.25rem;
+		height: 2.25rem;
 		border-radius: var(--radius-lg);
-		background: var(--color-primary);
+		background: linear-gradient(145deg, var(--color-primary), var(--color-primary-dark));
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		color: white;
-		box-shadow: 0 3px 0 var(--color-primary-dark);
+		box-shadow: 0 2px 8px oklch(44% 0.26 280 / 0.25), 0 1px 2px oklch(16% 0.02 280 / 0.1);
 	}
 
 	.brand-mark svg { width: 1.125rem; height: 1.125rem; }
@@ -195,39 +197,41 @@
 		display: flex;
 		align-items: center;
 		gap: 0.375rem;
-		padding: 0.3125rem 0.625rem;
+		padding: 0.375rem 0.75rem;
 		border-radius: var(--radius-full);
-		border: 2px solid var(--color-border);
-		border-bottom-width: 3px;
-		border-bottom-color: var(--color-border-strong);
-		background: var(--color-surface);
+		border: 1px solid oklch(0% 0 0 / 0.06);
+		background: oklch(100% 0 0 / 0.6);
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
 		font-size: 0.8125rem;
 		font-weight: 700;
 		color: var(--color-text);
 		text-decoration: none;
-		transition: transform 0.15s var(--ease-spring), border-color 0.15s ease;
+		transition: transform 0.2s var(--ease-smooth), border-color 0.2s ease, box-shadow 0.2s ease;
+		box-shadow: 0 1px 3px oklch(16% 0.02 280 / 0.06);
 	}
 
 	.nav-chip:hover {
 		transform: translateY(-1px);
 		border-color: var(--color-border-strong);
+		box-shadow: 0 3px 8px oklch(16% 0.02 280 / 0.1);
 	}
 
-	.nav-chip:active { transform: translateY(1px); }
+	.nav-chip:active { transform: translateY(0); box-shadow: none; }
 
 	.nav-chip-streak { color: var(--color-accent-dark); }
 	.nav-chip-streak .chip-icon { width: 0.875rem; height: 0.875rem; color: var(--color-accent); }
 	.nav-chip-spark .chip-value { color: var(--color-accent-dark); }
 
 	.nav-avatar {
-		width: 2rem;
-		height: 2rem;
+		width: 2.125rem;
+		height: 2.125rem;
 		border-radius: var(--radius-full);
-		background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+		background: linear-gradient(145deg, var(--color-primary), var(--color-primary-light));
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		box-shadow: 0 2px 0 var(--color-primary-dark);
+		box-shadow: 0 2px 6px oklch(44% 0.26 280 / 0.2), 0 0 0 2px oklch(100% 0 0 / 0.5);
 	}
 
 	.avatar-letter {
@@ -255,8 +259,10 @@
 		left: 0;
 		right: 0;
 		z-index: 40;
-		background: var(--color-surface);
-		border-top: 2px solid var(--color-border);
+		background: oklch(99% 0.003 280 / 0.78);
+		backdrop-filter: blur(24px) saturate(1.6);
+		-webkit-backdrop-filter: blur(24px) saturate(1.6);
+		border-top: 1px solid oklch(0% 0 0 / 0.05);
 		padding-bottom: env(safe-area-inset-bottom);
 		display: flex;
 		justify-content: space-around;

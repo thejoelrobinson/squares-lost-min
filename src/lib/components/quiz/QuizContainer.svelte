@@ -33,14 +33,23 @@
 	let quote = $derived(lessonSlug ? samQuotes[lessonSlug] ?? null : null);
 	let questionCount = $derived(questions.length);
 
-	let currentIndex = $state(0);
-	let scores = $state<(number | null)[]>([]);
-	let showResult = $state<boolean[]>([]);
+	// Queue-based state: indices into `questions`, grows when answers are wrong
+	let queue = $state<number[]>([]);
+	let currentQueuePos = $state(0);
+	let currentIndex = $derived(queue[currentQueuePos] ?? 0);
+
+	// Per-queue-slot result tracking (parallel arrays aligned with `queue`)
+	let queueScores = $state<(number | null)[]>([]);
+	let queueShowResult = $state<boolean[]>([]);
+
 	let quizFinished = $state(false);
 	let hearts = $state(MAX_HEARTS);
 	let showCorrectBurst = $state(false);
 	let showCheckmark = $state(false);
 	let resultsRevealed = $state(false);
+
+	const encouragements = ['Amazing!', 'You got it!', 'Nice one!', 'Correct!', 'Well done!', 'Nailed it!'];
+	let encourageText = $state('');
 	let xpPopup = $state<{ amount: number; key: number } | null>(null);
 	let xpKey = $state(0);
 	let answerTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -50,9 +59,10 @@
 	});
 
 	function resetQuiz() {
-		scores = Array(questionCount).fill(null);
-		showResult = Array(questionCount).fill(false);
-		currentIndex = 0;
+		queue = questions.map((_q, i) => i);
+		currentQueuePos = 0;
+		queueScores = Array(questions.length).fill(null);
+		queueShowResult = Array(questions.length).fill(false);
 		quizFinished = false;
 		hearts = MAX_HEARTS;
 		showCorrectBurst = false;
@@ -65,24 +75,36 @@
 	});
 
 	let currentQuestion = $derived(questions[currentIndex]);
-	let isLastQuestion = $derived(currentIndex === questionCount - 1);
-	let hasAnsweredCurrent = $derived(showResult[currentIndex]);
+	let isLastQuestion = $derived(currentQueuePos === queue.length - 1);
+	let hasAnsweredCurrent = $derived(queueShowResult[currentQueuePos] ?? false);
 	let outOfHearts = $derived(hearts <= 0);
+	let currentCorrect = $derived(queueScores[currentQueuePos] !== null && queueScores[currentQueuePos] !== undefined && queueScores[currentQueuePos]! >= PASS_THRESHOLD);
 
+	// Compute stats from unique questions only (best score per question index)
 	let { questionsCorrect, totalScore } = $derived.by(() => {
-		const answered = scores.filter((s): s is number => s !== null);
-		const correct = answered.filter((s) => s >= PASS_THRESHOLD).length;
-		const avg = answered.length === 0 ? 0 : answered.reduce((sum, s) => sum + s, 0) / answered.length;
+		const bestScores: Record<number, number> = {};
+		for (let i = 0; i < queue.length; i++) {
+			const s = queueScores[i];
+			if (s === null) continue;
+			const qIdx = queue[i];
+			if (bestScores[qIdx] === undefined || s > bestScores[qIdx]) {
+				bestScores[qIdx] = s;
+			}
+		}
+		const values = Object.values(bestScores);
+		const correct = values.filter((s) => s >= PASS_THRESHOLD).length;
+		const avg = values.length === 0 ? 0 : values.reduce((sum, s) => sum + s, 0) / values.length;
 		return { questionsCorrect: correct, totalScore: avg };
 	});
 
 	let passed = $derived(totalScore >= PASS_THRESHOLD && !outOfHearts);
 
 	function handleAnswer(score: number) {
-		scores[currentIndex] = score;
-		showResult[currentIndex] = true;
+		queueScores[currentQueuePos] = score;
+		queueShowResult[currentQueuePos] = true;
 
 		if (score >= PASS_THRESHOLD) {
+			encourageText = encouragements[Math.floor(Math.random() * encouragements.length)];
 			SoundEffects.play('correct');
 			Haptics.success();
 			showCorrectBurst = true;
@@ -103,6 +125,10 @@
 		} else {
 			SoundEffects.play('incorrect');
 			Haptics.error();
+			// Re-queue the failed question at the end
+			queue = [...queue, currentIndex];
+			queueScores = [...queueScores, null];
+			queueShowResult = [...queueShowResult, false];
 		}
 
 		if (score < PASS_THRESHOLD) {
@@ -118,7 +144,7 @@
 		if (isLastQuestion) {
 			quizFinished = true;
 		} else {
-			currentIndex += 1;
+			currentQueuePos += 1;
 		}
 	}
 
@@ -151,16 +177,16 @@
 		<!-- Header with progress pips and hearts -->
 		<div class="quiz-header">
 			<div class="quiz-meta">
-				<span class="quiz-counter">{currentIndex + 1}/{questions.length}</span>
+				<span class="quiz-counter">{currentQueuePos + 1}/{queue.length}</span>
 				<HeartIndicator {hearts} maxHearts={MAX_HEARTS} />
 			</div>
 			<div class="quiz-pips">
-				{#each questions as _q, i (i)}
+				{#each queue as _qIdx, i (i)}
 					<div
 						class="pip"
-						class:pip-current={i === currentIndex}
-						class:pip-correct={scores[i] !== null && scores[i]! >= PASS_THRESHOLD}
-						class:pip-wrong={scores[i] !== null && scores[i]! < PASS_THRESHOLD}
+						class:pip-current={i === currentQueuePos}
+						class:pip-correct={queueScores[i] !== null && queueScores[i] !== undefined && queueScores[i]! >= PASS_THRESHOLD}
+						class:pip-wrong={queueScores[i] !== null && queueScores[i] !== undefined && queueScores[i]! < PASS_THRESHOLD}
 					></div>
 				{/each}
 			</div>
@@ -184,7 +210,7 @@
 				{/key}
 			{/if}
 
-			{#key currentIndex}
+			{#key currentQueuePos}
 				<div in:fly={{ x: 40, duration: 300, delay: 200 }} out:fly={{ x: -40, duration: 200 }}>
 					{#if currentQuestion.type === 'multiple-choice'}
 						<MultipleChoice
@@ -234,10 +260,25 @@
 		</div>
 
 		{#if hasAnsweredCurrent}
-			<div class="quiz-footer" in:fly={{ y: 10, duration: 200 }}>
-				<Button onclick={next} fullWidth>
-					{isLastQuestion ? 'See Results' : 'Continue'}
-				</Button>
+			<div class="feedback-bar" class:feedback-correct={currentCorrect} class:feedback-incorrect={!currentCorrect}>
+				<div class="feedback-inner">
+					<div class="feedback-text-area">
+						{#if currentCorrect}
+							<svg class="feedback-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+							</svg>
+							<span class="feedback-label">{encourageText}</span>
+						{:else}
+							<svg class="feedback-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+							</svg>
+							<span class="feedback-label">Not quite!</span>
+						{/if}
+					</div>
+					<button type="button" class="feedback-continue" onclick={next}>
+						{isLastQuestion ? 'See Results' : 'Continue'}
+					</button>
+				</div>
 			</div>
 		{/if}
 	{:else}
@@ -253,7 +294,7 @@
 				<p class="results-text">Review the material and try again.</p>
 				<div class="results-actions">
 					<Button variant="secondary" onclick={resetQuiz}>Try Again</Button>
-					<Button onclick={handleContinue}>Continue Anyway</Button>
+					<Button variant="cta" onclick={handleContinue}>Continue Anyway</Button>
 				</div>
 			{:else}
 				<div class="results-icon" class:results-icon-pass={passed} class:results-icon-review={!passed} in:scale={{ duration: 400, delay: 100 }}>
@@ -323,7 +364,7 @@
 					{#if !passed}
 						<Button variant="secondary" onclick={resetQuiz}>Try Again</Button>
 					{/if}
-					<Button onclick={handleContinue}>Continue</Button>
+					<Button variant="cta" onclick={handleContinue}>Continue</Button>
 				</div>
 			{/if}
 		</div>
@@ -359,20 +400,21 @@
 
 	.pip {
 		flex: 1;
-		height: 0.375rem;
+		height: 0.3125rem;
 		border-radius: var(--radius-full);
-		background: var(--color-surface-raised);
-		transition: all 0.3s ease;
+		background: var(--color-surface-container);
+		transition: all 0.3s var(--ease-smooth);
 	}
 
 	.pip-current {
 		background: var(--color-primary);
-		box-shadow: 0 0 0 2px var(--color-primary-subtle);
-		transform: scaleY(1.3);
+		box-shadow: 0 0 0 2px var(--color-primary-subtle), 0 1px 4px oklch(44% 0.26 280 / 0.2);
+		transform: scaleY(1.4);
 	}
 
 	.pip-correct {
 		background: var(--color-success);
+		box-shadow: 0 0 4px oklch(58% 0.21 155 / 0.2);
 	}
 
 	.pip-wrong {
@@ -397,7 +439,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		border-bottom: 3px solid var(--color-success-dark);
+		border-bottom: 2px solid var(--color-success-dark);
 	}
 
 	.checkmark-badge svg {
@@ -422,9 +464,76 @@
 		100% { opacity: 0; transform: translateX(-50%) translateY(-40px); }
 	}
 
-	/* ── Footer ── */
-	.quiz-footer {
-		margin-top: 1.5rem;
+	/* ── Feedback bar ── */
+	.feedback-bar {
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		z-index: 50;
+		padding: 1rem 1.5rem;
+		padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+		animation: feedback-slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
+	}
+	.feedback-correct { background: oklch(58% 0.21 155 / 0.95); }
+	.feedback-incorrect { background: oklch(56% 0.24 18 / 0.95); }
+
+	.feedback-inner {
+		max-width: 42rem;
+		margin: 0 auto;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+	}
+	.feedback-text-area {
+		display: flex;
+		align-items: center;
+		gap: 0.625rem;
+	}
+	.feedback-icon {
+		width: 1.5rem;
+		height: 1.5rem;
+		color: white;
+		flex-shrink: 0;
+	}
+	.feedback-label {
+		font-family: 'Outfit', system-ui, sans-serif;
+		font-size: 1.0625rem;
+		font-weight: 800;
+		color: white;
+		letter-spacing: 0.01em;
+	}
+	.feedback-continue {
+		padding: 0.625rem 1.5rem;
+		border-radius: 9999px;
+		border: none;
+		font-family: 'Outfit', system-ui, sans-serif;
+		font-size: 0.8125rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		cursor: pointer;
+		white-space: nowrap;
+		transition: all 0.15s var(--ease-smooth);
+		box-shadow: 0 2px 6px oklch(16% 0.02 280 / 0.15);
+	}
+	.feedback-correct .feedback-continue {
+		background: white;
+		color: var(--color-success-dark);
+	}
+	.feedback-incorrect .feedback-continue {
+		background: white;
+		color: var(--color-error-dark);
+	}
+	.feedback-continue:hover { opacity: 0.92; transform: translateY(-1px); box-shadow: 0 4px 10px oklch(16% 0.02 280 / 0.2); }
+	.feedback-continue:active { transform: scale(0.97) translateY(0); box-shadow: none; }
+
+	@keyframes feedback-slide-up {
+		from { transform: translateY(100%); }
+		to { transform: translateY(0); }
 	}
 
 	/* ── Results ── */
@@ -438,8 +547,8 @@
 	}
 
 	.results-icon {
-		width: 4rem;
-		height: 4rem;
+		width: 4.5rem;
+		height: 4.5rem;
 		border-radius: 50%;
 		display: flex;
 		align-items: center;
@@ -452,18 +561,21 @@
 	}
 
 	.results-icon-pass {
-		background: oklch(62% 0.19 160 / 0.12);
+		background: linear-gradient(145deg, oklch(62% 0.19 160 / 0.15), oklch(58% 0.21 155 / 0.08));
 		color: var(--color-success);
+		box-shadow: 0 4px 16px oklch(58% 0.21 155 / 0.15);
 	}
 
 	.results-icon-review {
-		background: var(--color-primary-subtle);
+		background: linear-gradient(145deg, oklch(44% 0.26 280 / 0.1), oklch(44% 0.26 280 / 0.05));
 		color: var(--color-primary);
+		box-shadow: 0 4px 16px oklch(44% 0.26 280 / 0.1);
 	}
 
 	.results-icon-fail {
-		background: oklch(60% 0.22 22 / 0.12);
+		background: linear-gradient(145deg, oklch(60% 0.22 22 / 0.15), oklch(56% 0.24 18 / 0.08));
 		color: var(--color-error);
+		box-shadow: 0 4px 16px oklch(56% 0.24 18 / 0.12);
 	}
 
 	.results-icon-fail svg {
@@ -492,8 +604,8 @@
 	}
 
 	.accuracy-ring-svg {
-		width: 7rem;
-		height: 7rem;
+		width: 10rem;
+		height: 10rem;
 	}
 
 	.accuracy-ring-fill {
@@ -515,7 +627,7 @@
 
 	.accuracy-value {
 		font-family: 'Bricolage Grotesque', system-ui, sans-serif;
-		font-size: 1.625rem;
+		font-size: 2.25rem;
 		font-weight: 800;
 	}
 
@@ -523,7 +635,7 @@
 	.text-error { color: var(--color-error); }
 
 	.accuracy-text {
-		font-size: 0.625rem;
+		font-size: 0.75rem;
 		font-weight: 600;
 		color: var(--color-text-muted);
 		text-transform: uppercase;

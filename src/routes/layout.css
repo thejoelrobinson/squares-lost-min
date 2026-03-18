@@ -21,11 +21,14 @@
   --color-accent-dark: oklch(60% 0.155 70);
   --color-accent-light: oklch(90% 0.08 70);
 
-  /* Surfaces — warm parchment undertone */
-  --color-bg: oklch(97% 0.006 75);
-  --color-surface: oklch(99.5% 0.002 75);
-  --color-surface-raised: oklch(95.5% 0.008 75);
-  --color-surface-sunken: oklch(93% 0.01 75);
+  /* Surfaces — tonal elevation with subtle primary tint */
+  --color-bg: oklch(97.8% 0.003 280);
+  --color-surface: oklch(99.2% 0.002 280);
+  --color-surface-raised: oklch(96.5% 0.005 280);
+  --color-surface-sunken: oklch(94% 0.008 280);
+  --color-surface-container-low: oklch(97% 0.005 280);
+  --color-surface-container: oklch(95.5% 0.007 280);
+  --color-surface-container-high: oklch(93.5% 0.01 280);
 
   /* Text — deep charcoal with cool tint for contrast */
   --color-text: oklch(16% 0.02 280);
@@ -43,8 +46,8 @@
   --color-reward-glow: oklch(78% 0.155 70);
 
   /* Borders */
-  --color-border: oklch(91% 0.006 75);
-  --color-border-strong: oklch(83% 0.012 75);
+  --color-border: oklch(92% 0.004 280);
+  --color-border-strong: oklch(85% 0.008 280);
 
   /* Shadows — layered, tinted for realism */
   --shadow-xs: 0 1px 2px oklch(16% 0.02 280 / 0.05);
@@ -64,8 +67,19 @@
   --radius-2xl: 1.5rem;
   --radius-full: 9999px;
 
+  /* Type scale — mathematical intervals */
+  --font-size-xs: 0.6875rem;
+  --font-size-sm: 0.8125rem;
+  --font-size-base: 0.9375rem;
+  --font-size-lg: 1.0625rem;
+  --font-size-xl: 1.375rem;
+  --font-size-2xl: 1.75rem;
+  --font-size-3xl: 2.125rem;
+
   /* Animation timing */
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --ease-snappy: cubic-bezier(0.2, 0, 0, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out-smooth: cubic-bezier(0.65, 0, 0.35, 1);
 }

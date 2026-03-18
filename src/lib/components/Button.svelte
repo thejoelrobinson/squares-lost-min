@@ -4,7 +4,7 @@
 	import Haptics from '$lib/utils/haptics';
 
 	interface Props {
-		variant?: 'primary' | 'secondary' | 'ghost' | 'success' | 'danger';
+		variant?: 'primary' | 'secondary' | 'ghost' | 'success' | 'danger' | 'cta';
 		size?: 'sm' | 'md' | 'lg';
 		disabled?: boolean;
 		type?: 'button' | 'submit';
@@ -84,90 +84,102 @@
 		z-index: 1;
 	}
 
-	/* ─── PRIMARY ─── */
+	/* ─── PRIMARY (flat + scale) ─── */
 	.btn-primary {
 		background: var(--color-primary);
 		color: white;
-		border-radius: var(--radius-xl);
-		border-bottom: 5px solid var(--color-primary-dark);
-		transform: translateY(0);
-		transition: transform 0.12s var(--ease-spring), border-bottom-width 0.08s ease, filter 0.15s ease;
+		border-radius: var(--radius-full);
+		transition: opacity 0.15s ease, transform 0.12s var(--ease-smooth), box-shadow 0.15s ease;
+		box-shadow: 0 2px 6px oklch(44% 0.26 280 / 0.2);
 	}
 
 	.btn-primary:hover:not(.btn-disabled) {
-		filter: brightness(1.12);
-		transform: translateY(-1px);
+		opacity: 0.92;
+		box-shadow: 0 4px 12px oklch(44% 0.26 280 / 0.25);
 	}
 
 	.btn-primary:active:not(.btn-disabled) {
-		transform: translateY(3px);
-		border-bottom-width: 2px;
-		filter: brightness(0.95);
+		transform: scale(0.97);
+		opacity: 0.92;
+		box-shadow: 0 1px 3px oklch(44% 0.26 280 / 0.15);
 	}
 
-	/* ─── SUCCESS ─── */
+	/* ─── SUCCESS (flat + scale) ─── */
 	.btn-success {
 		background: var(--color-success);
 		color: white;
-		border-radius: var(--radius-xl);
-		border-bottom: 5px solid var(--color-success-dark);
-		transform: translateY(0);
-		transition: transform 0.12s var(--ease-spring), border-bottom-width 0.08s ease, filter 0.15s ease;
+		border-radius: var(--radius-full);
+		transition: opacity 0.15s ease, transform 0.12s var(--ease-smooth);
 	}
 
 	.btn-success:hover:not(.btn-disabled) {
-		filter: brightness(1.12);
-		transform: translateY(-1px);
+		opacity: 0.88;
 	}
 
 	.btn-success:active:not(.btn-disabled) {
-		transform: translateY(3px);
-		border-bottom-width: 2px;
-		filter: brightness(0.95);
+		transform: scale(0.97);
+		opacity: 0.92;
 	}
 
-	/* ─── DANGER ─── */
+	/* ─── DANGER (flat + scale) ─── */
 	.btn-danger {
 		background: var(--color-error);
 		color: white;
-		border-radius: var(--radius-xl);
-		border-bottom: 5px solid var(--color-error-dark);
-		transform: translateY(0);
-		transition: transform 0.12s var(--ease-spring), border-bottom-width 0.08s ease, filter 0.15s ease;
+		border-radius: var(--radius-full);
+		transition: opacity 0.15s ease, transform 0.12s var(--ease-smooth);
 	}
 
 	.btn-danger:hover:not(.btn-disabled) {
-		filter: brightness(1.12);
-		transform: translateY(-1px);
+		opacity: 0.88;
 	}
 
 	.btn-danger:active:not(.btn-disabled) {
-		transform: translateY(3px);
-		border-bottom-width: 2px;
-		filter: brightness(0.95);
+		transform: scale(0.97);
+		opacity: 0.92;
 	}
 
-	/* ─── SECONDARY ─── */
+	/* ─── SECONDARY (flat + scale) ─── */
 	.btn-secondary {
 		background: var(--color-surface);
 		color: var(--color-primary);
-		border-radius: var(--radius-xl);
+		border-radius: var(--radius-full);
 		border: 2.5px solid var(--color-border-strong);
-		border-bottom-width: 5px;
-		transform: translateY(0);
-		transition: transform 0.12s var(--ease-spring), border-bottom-width 0.08s ease, background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+		transition: opacity 0.15s ease, transform 0.12s var(--ease-smooth), background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 	}
 
 	.btn-secondary:hover:not(.btn-disabled) {
 		background: var(--color-primary-subtle);
 		border-color: var(--color-primary-light);
 		color: var(--color-primary-hover);
-		transform: translateY(-1px);
 	}
 
 	.btn-secondary:active:not(.btn-disabled) {
+		transform: scale(0.97);
+		opacity: 0.92;
+	}
+
+	/* ─── CTA (3D border-bottom press effect, pill radius) ─── */
+	.btn-cta {
+		background: linear-gradient(180deg, oklch(48% 0.26 280) 0%, var(--color-primary) 100%);
+		color: white;
+		border-radius: var(--radius-full);
+		border-bottom: 5px solid var(--color-primary-dark);
+		transform: translateY(0);
+		transition: transform 0.12s var(--ease-smooth), border-bottom-width 0.08s ease, filter 0.15s ease, box-shadow 0.15s ease;
+		box-shadow: 0 4px 12px oklch(44% 0.26 280 / 0.25), 0 1px 3px oklch(16% 0.02 280 / 0.1);
+	}
+
+	.btn-cta:hover:not(.btn-disabled) {
+		filter: brightness(1.08);
+		transform: translateY(-2px);
+		box-shadow: 0 6px 20px oklch(44% 0.26 280 / 0.3), 0 2px 4px oklch(16% 0.02 280 / 0.1);
+	}
+
+	.btn-cta:active:not(.btn-disabled) {
 		transform: translateY(3px);
-		border-bottom-width: 2.5px;
+		border-bottom-width: 2px;
+		filter: brightness(0.95);
+		box-shadow: 0 1px 4px oklch(44% 0.26 280 / 0.15);
 	}
 
 	/* ─── GHOST ─── */
@@ -194,24 +206,13 @@
 		font-size: 0.6875rem;
 	}
 
-	.btn-sm.btn-primary, .btn-sm.btn-success, .btn-sm.btn-danger {
+	.btn-sm.btn-cta {
 		border-bottom-width: 4px;
 	}
 
-	.btn-sm.btn-primary:active:not(.btn-disabled),
-	.btn-sm.btn-success:active:not(.btn-disabled),
-	.btn-sm.btn-danger:active:not(.btn-disabled) {
+	.btn-sm.btn-cta:active:not(.btn-disabled) {
 		transform: translateY(2px);
 		border-bottom-width: 2px;
-	}
-
-	.btn-sm.btn-secondary {
-		border-bottom-width: 4px;
-	}
-
-	.btn-sm.btn-secondary:active:not(.btn-disabled) {
-		transform: translateY(2px);
-		border-bottom-width: 2.5px;
 	}
 
 	.btn-md {

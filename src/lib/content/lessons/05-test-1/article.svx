@@ -1,0 +1,33 @@
+---
+part: 5
+title: "Feedback in Action"
+slug: "test-1"
+readingTime: 2
+---
+
+## Test 1: Feedback in Action
+
+It's Friday afternoon, and you're about to head into a 1:1 with Jamie — one of the associates on your team. You've been meaning to talk about something that happened earlier this week, and now is your chance.
+
+### The Tuesday Morning Presentation
+
+On **Tuesday morning**, your team presented quarterly results to an important client. Overall it went well, but two specific moments stood out — one that impressed you, and one that concerns you.
+
+### The Backup Slide
+
+Midway through the presentation, the client was visibly confused by a data visualization on one of the main slides. Before anyone else could react, **Jamie proactively pulled up a backup slide** with clearer visuals that broke down the same data point in a more digestible way. The client immediately understood, nodded along, and the presentation flow was saved. It was a sharp, well-prepared move.
+
+### The Q&A Interruptions
+
+During the Q&A portion, things got rocky. Your senior colleague **Taylor** was fielding a question from the client when **Jamie jumped in and answered it instead**. This happened **three times**. On the third interruption, Jamie also stated a project timeline that **hasn't actually been confirmed** yet. You noticed the client shift uncomfortably in their seat. After the meeting, Taylor pulled you aside, visibly frustrated.
+
+### Your Task
+
+You now have both behaviors to address in your 1:1 with Jamie. Drawing on everything you've learned in Lessons 02 through 04, you'll need to:
+
+- **Give corrective feedback** about the interruptions using the SBI model
+- **Give positive feedback** about the backup slide initiative using the SBI model
+- Keep your language **observable** — describe what you saw, not what you assume Jamie was thinking
+- Remember that feedback is **information**, and Jamie will filter it through their own personal lens
+
+Take a moment to organize your thoughts. When you're ready, move on to the comprehension check where you'll put these skills to the test.

@@ -3,6 +3,7 @@
 	import SparkIcon from '$lib/components/SparkIcon.svelte';
 	import SyncedTranscript from '$lib/components/SyncedTranscript.svelte';
 	import PodcastAsk from '$lib/components/PodcastAsk.svelte';
+	import Button from '$lib/components/Button.svelte';
 
 	interface Props {
 		src: string;
@@ -288,12 +289,14 @@
 	<!-- Continue button -->
 	{#if hasListened}
 		<div class="continue-area">
-			<button type="button" class="continue-btn" onclick={onComplete}>
-				Continue
-				<svg class="continue-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-					<path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-				</svg>
-			</button>
+			<Button variant="cta" size="lg" onclick={onComplete}>
+				<span class="continue-inner">
+					Continue
+					<svg class="continue-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+					</svg>
+				</span>
+			</Button>
 		</div>
 	{/if}
 </div>
@@ -308,18 +311,23 @@
 	/* ── Cover Art ── */
 	.cover-art {
 		position: relative;
-		width: 15rem;
+		width: 14rem;
 		aspect-ratio: 1;
 		margin: 0 auto 1.75rem;
 		border-radius: var(--radius-2xl);
 		overflow: hidden;
-		box-shadow: var(--shadow-xl);
-		transition: transform 0.5s var(--ease-spring);
+		box-shadow:
+			0 8px 32px oklch(16% 0.02 280 / 0.15),
+			0 2px 8px oklch(16% 0.02 280 / 0.08);
+		transition: transform 0.6s var(--ease-out-expo), box-shadow 0.6s var(--ease-out-expo);
 	}
 
 	.cover-playing {
-		transform: scale(1.03) rotate(0.5deg);
-		box-shadow: var(--shadow-xl), var(--shadow-glow-primary);
+		transform: scale(1.03);
+		box-shadow:
+			0 12px 40px oklch(44% 0.26 280 / 0.2),
+			0 4px 12px oklch(16% 0.02 280 / 0.1),
+			0 0 0 1px oklch(44% 0.26 280 / 0.08);
 	}
 
 	.cover-gradient {
@@ -346,6 +354,9 @@
 		align-items: center;
 		justify-content: center;
 		gap: 1rem;
+		backdrop-filter: blur(40px) saturate(1.8);
+		-webkit-backdrop-filter: blur(40px) saturate(1.8);
+		background: oklch(100% 0 0 / 0.06);
 	}
 
 	.cover-icon-wrap {
@@ -416,7 +427,7 @@
 		position: absolute;
 		top: 50%;
 		width: 100%;
-		height: 5px;
+		height: 4px;
 		transform: translateY(-50%);
 		border-radius: var(--radius-full);
 		background: var(--color-surface-sunken);
@@ -425,10 +436,10 @@
 	.seekbar-fill {
 		position: absolute;
 		top: 50%;
-		height: 5px;
+		height: 4px;
 		transform: translateY(-50%);
 		border-radius: var(--radius-full);
-		background: var(--color-primary);
+		background: linear-gradient(90deg, var(--color-primary), var(--color-primary-hover));
 		transition: width 0.05s linear;
 	}
 
@@ -505,6 +516,8 @@
 	}
 
 	.play-btn {
+		position: relative;
+		overflow: hidden;
 		width: 4.25rem;
 		height: 4.25rem;
 		border-radius: 50%;
@@ -513,23 +526,35 @@
 		justify-content: center;
 		cursor: pointer;
 		border: none;
-		border-bottom: 5px solid var(--color-secondary);
 		background: var(--color-text);
 		color: var(--color-bg);
-		box-shadow: var(--shadow-lg);
+		box-shadow: 0 4px 16px oklch(16% 0.02 280 / 0.2), 0 1px 4px oklch(16% 0.02 280 / 0.1);
 		transform: translateY(0);
-		transition: transform 0.12s var(--ease-spring), border-bottom-width 0.08s ease, filter 0.15s ease;
+		transition: transform 0.15s var(--ease-smooth), box-shadow 0.2s ease;
 	}
 
+	.play-btn::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		border-radius: 50%;
+		background: white;
+		opacity: 0;
+		transition: opacity 0.15s ease;
+		pointer-events: none;
+	}
+
+	.play-btn:hover::before { opacity: 0.1; }
+	.play-btn:active::before { opacity: 0.15; }
+
 	.play-btn:hover {
-		filter: brightness(1.15);
-		transform: translateY(-1px);
+		transform: translateY(-2px);
+		box-shadow: 0 6px 24px oklch(16% 0.02 280 / 0.25), 0 2px 6px oklch(16% 0.02 280 / 0.1);
 	}
 
 	.play-btn:active {
-		transform: translateY(3px);
-		border-bottom-width: 2px;
-		filter: brightness(0.92);
+		transform: scale(0.96);
+		box-shadow: 0 2px 8px oklch(16% 0.02 280 / 0.15);
 	}
 
 	.play-icon {
@@ -548,27 +573,34 @@
 		justify-content: center;
 		gap: 0.5rem;
 		padding-top: 1rem;
-		border-top: 2px solid var(--color-border);
+		border-top: 1px solid var(--color-border);
 	}
 
 	.action-chip {
 		display: flex;
 		align-items: center;
 		gap: 0.375rem;
-		padding: 0.5rem 0.75rem;
+		padding: 0.5rem 0.875rem;
 		border-radius: var(--radius-full);
-		border: 2px solid var(--color-border);
+		border: 1px solid var(--color-border);
 		background: var(--color-surface);
 		font-size: 0.75rem;
 		font-weight: 700;
 		color: var(--color-text-muted);
 		cursor: pointer;
-		transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+		transition: all 0.2s var(--ease-smooth);
+		box-shadow: 0 1px 2px oklch(16% 0.02 280 / 0.03);
 	}
 
 	.action-chip:hover {
 		border-color: var(--color-primary-light);
 		color: var(--color-primary);
+		box-shadow: 0 2px 6px oklch(44% 0.26 280 / 0.08);
+		transform: translateY(-1px);
+	}
+
+	.action-chip:active {
+		transform: translateY(0);
 	}
 
 	.action-chip-active {
@@ -602,36 +634,10 @@
 		text-align: center;
 	}
 
-	.continue-btn {
+	.continue-inner {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.5rem;
-		padding: 0.875rem 2.25rem;
-		border-radius: var(--radius-xl);
-		border: none;
-		border-bottom: 5px solid var(--color-primary-dark);
-		background: var(--color-primary);
-		color: white;
-		font-family: 'Outfit', system-ui, sans-serif;
-		font-size: 0.875rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.04em;
-		cursor: pointer;
-		box-shadow: var(--shadow-md);
-		transform: translateY(0);
-		transition: transform 0.12s var(--ease-spring), border-bottom-width 0.08s ease, filter 0.15s ease;
-	}
-
-	.continue-btn:hover {
-		filter: brightness(1.12);
-		transform: translateY(-1px);
-	}
-
-	.continue-btn:active {
-		transform: translateY(3px);
-		border-bottom-width: 2px;
-		filter: brightness(0.95);
 	}
 
 	.continue-arrow {

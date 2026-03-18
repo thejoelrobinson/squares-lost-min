@@ -28,28 +28,34 @@
 		border-radius: var(--radius-2xl);
 		background: var(--color-surface);
 		position: relative;
+		transition: box-shadow 0.3s var(--ease-smooth), border-color 0.3s ease;
 	}
 
 	.card-default {
-		border: 2px solid var(--color-border);
-		border-bottom-width: 4px;
-		border-bottom-color: var(--color-border-strong);
+		border: 1px solid var(--color-border);
+		box-shadow: 0 1px 2px oklch(16% 0.02 280 / 0.03);
 	}
 
 	.card-elevated {
-		border: 2px solid var(--color-border);
-		box-shadow: var(--shadow-lg);
+		border: 1px solid oklch(0% 0 0 / 0.04);
+		box-shadow:
+			0 1px 2px oklch(16% 0.02 280 / 0.04),
+			0 4px 16px oklch(16% 0.02 280 / 0.06),
+			0 12px 40px oklch(16% 0.02 280 / 0.04);
 	}
 
 	.card-outlined {
-		border: 2.5px solid var(--color-border-strong);
+		border: 1.5px solid var(--color-border-strong);
 	}
 
 	/* Featured card — gradient top border accent */
 	.card-featured {
-		border: 2px solid var(--color-border);
+		border: 1px solid oklch(0% 0 0 / 0.04);
 		border-top: none;
 		overflow: hidden;
+		box-shadow:
+			0 1px 2px oklch(16% 0.02 280 / 0.04),
+			0 4px 16px oklch(16% 0.02 280 / 0.06);
 	}
 
 	.card-featured::before {
@@ -58,7 +64,7 @@
 		top: 0;
 		left: 0;
 		right: 0;
-		height: 4px;
+		height: 3px;
 		background: linear-gradient(90deg, var(--color-primary), var(--color-accent), var(--color-success));
 		border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
 	}

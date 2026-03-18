@@ -11,6 +11,7 @@ const slugToFolder: Record<string, string> = {
 	'why-feedback-matters': '02-psychology-perception',
 	'sbi-framework': '03-chronology-intervention',
 	'timing-is-everything': '04-sbi-structural-model',
+	'test-1': '05-test-1',
 	'reading-the-room': '06-delivery-into-dialogue',
 	'being-specific': '07-case-studies-scenarios',
 	'hard-conversations': '08-cognitive-resistance',

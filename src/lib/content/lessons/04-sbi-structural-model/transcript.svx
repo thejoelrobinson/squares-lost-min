@@ -1,13 +1,65 @@
 ---
 part: 4
-title: "Timing Is Everything"
+title: "The SBI Structural Model"
 slug: "timing-is-everything"
 ---
 
 ## Transcript
 
-This lesson explores the critical role of timing in delivering effective feedback. Jordan and Sam discuss the balance between giving feedback promptly — while details are fresh — and waiting until the recipient is ready to hear it.
+**Jamie:** Welcome back, everyone, to Walmart Academy's The Art of Feedback. I'm Jamie, alongside leadership expert Alex. In our last episode, we talked all about the timing of feedback — catching those real-time moments. Today, we are tackling the million-dollar question: How do we actually say the words without it turning into a defensive argument?
 
-Topics covered include recognizing when emotions are running too high for feedback to land, the "24-hour rule" for not waiting too long, and how to read signals that tell you whether now is the right moment. The hosts share examples of feedback that missed the mark simply because of poor timing and contrast them with well-timed interventions that led to real change.
+**Alex:** It is the toughest part of the job for so many leaders, Jamie. Because feedback can easily get clouded by raw emotion, or misinterpretation. If we aren't careful, a well-intentioned conversation can quickly go off the rails. That is exactly why leaders have to use a structured approach.
 
-*Full transcript coming soon.*
+**Jamie:** We... need a blueprint!
+
+**Alex:** Exactly! And the absolute best blueprint out there is the SBI feedback model. It is a simple, highly effective framework designed to make feedback significantly clearer. It keeps the conversation strictly focused on observable facts, rather than subjective assumptions or emotions.
+
+**Jamie:** Which naturally dials down the defensiveness, I imagine?
+
+**Alex:** Dramatically. By relying on this strict structure, you reduce misinterpretation, drop the defensive shields, and pave the way for a productive, growth-focused dialogue.
+
+**Jamie:** Okay, I'm sold. What does SBI stand for?
+
+**Alex:** It stands for Situation, Behavior, and Impact. Let's break them down. First up is the "S" — Situation. You must define the exact "where" and "when" of the situation you are discussing. Be specific.
+
+**Jamie:** So, what would be an ineffective way to do that?
+
+**Alex:** An ineffective start sounds like this: "When dealing with customers, you always act..." It's too broad, and words like "always" immediately make people defensive, because it feels like an attack on their character.
+
+**Jamie:** That makes sense. So, how do we fix it using the "Situation" step?
+
+**Alex:** You anchor it in time and space. An effective example would be: "In our team meeting on Tuesday..." You've just established the factual setting. No one can argue with Tuesday's team meeting.
+
+**Jamie:** Perfect. Okay, so we have our Situation. What is the "B" — Behavior?
+
+**Alex:** This is where you must describe the specific behavior that actually occurred. Again, just the observable facts. What did you see or hear?
+
+**Jamie:** So, avoiding things like "you were being rude," which is an assumption, and instead saying what they actually did?
+
+**Alex:** Exactly! Examples of observable behavior would be: crossing arms, interrupting others, returning late from lunch, or walking by a spill and not taking action. You are simply stating the action that took place within that specific situation.
+
+**Jamie:** Alright, that brings us to the final piece: the "I" — Impact.
+
+**Alex:** Yes. You have to clearly explain the impact that the behavior had on you, the customer, or the business as a whole. This is the "why it matters" part of the conversation.
+
+**Jamie:** Can you give us an example of a negative impact?
+
+**Alex:** Sure. Let's say the behavior was leaving equipment out. The impact statement would be: "When ladders aren't secured, our customers are put at risk." You connect the action directly to the consequence.
+
+**Jamie:** And we talked last episode about how important it is to reinforce positive behavior, too. How does SBI work for that?
+
+**Alex:** It works beautifully for positive reinforcement! Let's say an associate was doing a great job listening during a huddle. Your impact statement might be: "When you make space for others to finish their thoughts, it helps them feel heard and valued."
+
+**Jamie:** Situation, Behavior, Impact. It takes the guesswork and the emotion entirely out of the equation.
+
+**Alex:** It does. It transforms a stressful confrontation into a clear, factual, and supportive conversation. Oh, and Jamie? One more thing before we go.
+
+**Jamie:** Uh oh. I don't like that tone.
+
+**Alex:** Next up, it's test time. I highly hope you — and everyone listening — have been paying attention.
+
+**Jamie:** Wait, a pop quiz?! Is this going on my permanent record? I thought we were friends!
+
+**Alex:** Consider this your "S" — the Situation. Next episode, we're testing your "B" — Behavior.
+
+**Jamie:** And the "I" is going to be the Impact on my ego. Alright, folks, grab your No. 2 pencils and cram while you can.

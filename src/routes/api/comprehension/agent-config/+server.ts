@@ -28,7 +28,29 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 	const objectives = content?.objectives ?? [];
 	const objectivesList = objectives.map((o, i) => `${i + 1}. ${o}`).join('\n');
 
-	const transcriptContext = `MODE: COMPREHENSION CHECK — Assess the learner's understanding through Socratic dialogue. Do not re-teach; probe what they retained.\n\nLesson objectives to assess:\n${objectivesList}\n\nKeep the check to 3-5 exchanges. When satisfied they understand, wrap up naturally.`;
+	let transcriptContext: string;
+	let scenarioGreeting: string | undefined;
+
+	if (content?.jamieSystemPrompt) {
+		const evalObjectives = content.scenarioEvaluationObjectives ?? objectives;
+		const evalList = evalObjectives.map((o, i) => `${i + 1}. ${o}`).join('\n');
+
+		transcriptContext = `MODE: SCENARIO ROLEPLAY
+
+## Character Brief
+${content.jamieSystemPrompt}
+
+## Behaviors to Address
+The learner must give feedback on ALL of the following. Do not end the conversation until all are covered:
+${content.scenarioBriefing ?? ''}
+
+## Evaluation Criteria
+${evalList}`;
+
+		scenarioGreeting = content.jamieOpener;
+	} else {
+		transcriptContext = `MODE: COMPREHENSION CHECK — Assess the learner's understanding through Socratic dialogue. Do not re-teach; probe what they retained.\n\nLesson objectives to assess:\n${objectivesList}\n\nKeep the check to 3-5 exchanges. When satisfied they understand, wrap up naturally.`;
+	}
 
 	const config = buildAgentConfig(
 		{ title: lesson.title, slug: lesson.slug },
@@ -38,7 +60,8 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 			teamSize: user.teamSize,
 			comfortLevel: user.comfortLevel
 		},
-		transcriptContext
+		transcriptContext,
+		scenarioGreeting
 	);
 
 	return json(config);

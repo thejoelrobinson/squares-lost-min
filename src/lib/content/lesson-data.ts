@@ -10,6 +10,10 @@ export interface LessonContent {
 	quiz: QuizQuestion[];
 	subtitles?: SubtitleCue[];
 	coinImage?: string;
+	scenarioBriefing?: string;
+	jamieSystemPrompt?: string;
+	scenarioEvaluationObjectives?: string[];
+	jamieOpener?: string;
 }
 
 import * as psychologyPerception from './lessons/02-psychology-perception/quiz';
@@ -17,9 +21,11 @@ import { cues as psychologyPerceptionCues } from './lessons/02-psychology-percep
 import * as chronologyIntervention from './lessons/03-chronology-intervention/quiz';
 import { cues as chronologyInterventionCues } from './lessons/03-chronology-intervention/subtitles';
 import * as sbiStructuralModel from './lessons/04-sbi-structural-model/quiz';
+import { cues as sbiStructuralModelCues } from './lessons/04-sbi-structural-model/subtitles';
 import * as deliveryIntoDialogue from './lessons/06-delivery-into-dialogue/quiz';
 import * as caseStudiesScenarios from './lessons/07-case-studies-scenarios/quiz';
 import * as cognitiveResistance from './lessons/08-cognitive-resistance/quiz';
+import * as test1 from './lessons/05-test-1/quiz';
 import * as advancedTactics from './lessons/10-advanced-tactics/quiz';
 
 export const lessonContent: Record<string, LessonContent> = {
@@ -36,7 +42,12 @@ export const lessonContent: Record<string, LessonContent> = {
 	},
 	'timing-is-everything': {
 		...sbiStructuralModel,
-		podcastFile: '/audio/04-timing-is-everything/podcast.mp3'
+		podcastFile: '/audio/04-timing-is-everything/podcast.mp3',
+		subtitles: sbiStructuralModelCues
+	},
+	'test-1': {
+		...test1,
+		podcastFile: ''
 	},
 	'reading-the-room': {
 		...deliveryIntoDialogue,

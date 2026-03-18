@@ -14,20 +14,24 @@
 		scenario: string | null;
 	}
 
-	let { existingUser = null }: { existingUser?: ExistingUser | null } = $props();
+	const { existingUser = null }: { existingUser?: ExistingUser | null } = $props();
+
+	// Snapshot prop — intentionally capturing initial value for form pre-population
+	// svelte-ignore state_referenced_locally
+	const _init = existingUser;
 
 	let currentStep = $state(1);
 	const totalSteps = 7;
 
 	// Form state — pre-populate from existing user if available
-	let firstName = $state(existingUser?.name ?? '');
-	let lastName = $state(existingUser?.lastName ?? '');
-	let role = $state(existingUser?.role ?? '');
-	let teamSize = $state(existingUser?.teamSize ?? 5);
-	let feedbackFrequency = $state(existingUser?.feedbackFrequency ?? '');
-	let comfortLevel = $state(existingUser?.comfortLevel ?? 3);
-	let challenges = $state<string[]>(existingUser ? JSON.parse(existingUser.challenges) : []);
-	let scenario = $state(existingUser?.scenario ?? '');
+	let firstName = $state(_init?.name ?? '');
+	let lastName = $state(_init?.lastName ?? '');
+	let role = $state(_init?.role ?? '');
+	let teamSize = $state(_init?.teamSize ?? 5);
+	let feedbackFrequency = $state(_init?.feedbackFrequency ?? '');
+	let comfortLevel = $state(_init?.comfortLevel ?? 3);
+	let challenges = $state<string[]>(_init ? JSON.parse(_init.challenges) : []);
+	let scenario = $state(_init?.scenario ?? '');
 
 	// Validation
 	let canContinue = $derived.by(() => {
@@ -99,11 +103,11 @@
 
 <div class="w-full max-w-lg">
 	<!-- Step indicator -->
-	<div class="mb-8 text-center">
-		<p class="mb-2 text-sm font-medium text-text-muted">Step {currentStep} of {totalSteps}</p>
-		<div class="mx-auto h-2 w-full overflow-hidden rounded-full bg-surface-raised">
+	<div class="step-indicator">
+		<p class="step-label">Step {currentStep} of {totalSteps}</p>
+		<div class="step-track">
 			<div
-				class="h-full rounded-full bg-primary transition-all duration-500 ease-out"
+				class="step-fill"
 				style="width: {progressPercent}%"
 			></div>
 		</div>
@@ -127,7 +131,7 @@
 								type="text"
 								bind:value={firstName}
 								placeholder="Joel"
-								class="w-full rounded-lg border border-primary/20 bg-surface px-4 py-2.5 text-text placeholder:text-text-muted/50 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
+								class="form-input"
 							/>
 						</div>
 						<div>
@@ -139,7 +143,7 @@
 								type="text"
 								bind:value={lastName}
 								placeholder="Robinson"
-								class="w-full rounded-lg border border-primary/20 bg-surface px-4 py-2.5 text-text placeholder:text-text-muted/50 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
+								class="form-input"
 							/>
 						</div>
 					</div>
@@ -151,7 +155,7 @@
 						<select
 							id="role"
 							bind:value={role}
-							class="w-full rounded-lg border border-primary/20 bg-surface px-4 py-2.5 text-text focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
+							class="form-input"
 						>
 							<option value="" disabled>Select your role</option>
 							<option value="manager">Manager</option>
@@ -180,7 +184,7 @@
 						bind:value={teamSize}
 						min="1"
 						max="100"
-						class="w-full rounded-lg border border-primary/20 bg-surface px-4 py-2.5 text-text focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
+						class="form-input"
 					/>
 					<p class="mt-1 text-sm text-text-muted">
 						Include direct reports or close collaborators.
@@ -289,7 +293,7 @@
 					bind:value={scenario}
 					rows={5}
 					placeholder="e.g., I need to tell a team member that their code reviews are too superficial, but they're sensitive to criticism..."
-					class="w-full rounded-lg border border-primary/20 bg-surface px-4 py-2.5 text-text placeholder:text-text-muted/50 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
+					class="form-input"
 				></textarea>
 
 				<p class="mt-2 text-sm text-text-muted">
@@ -371,7 +375,7 @@
 				<input type="hidden" name="scenario" value={scenario} />
 
 				<div class="mt-6">
-					<Button type="submit" size="lg" variant="primary">
+					<Button type="submit" size="lg" variant="cta">
 						Start Learning
 					</Button>
 				</div>
@@ -401,3 +405,56 @@
 		{/if}
 	</form>
 </div>
+
+<style>
+	.step-indicator {
+		margin-bottom: 2rem;
+		text-align: center;
+	}
+
+	.step-label {
+		font-size: 0.8125rem;
+		font-weight: 600;
+		color: var(--color-text-muted);
+		margin-bottom: 0.5rem;
+	}
+
+	.step-track {
+		width: 100%;
+		height: 0.375rem;
+		border-radius: var(--radius-full);
+		background: var(--color-surface-raised);
+		overflow: hidden;
+		box-shadow: inset 0 1px 2px oklch(16% 0.02 280 / 0.04);
+	}
+
+	.step-fill {
+		height: 100%;
+		border-radius: var(--radius-full);
+		background: linear-gradient(90deg, var(--color-primary), var(--color-primary-hover));
+		transition: width 0.5s var(--ease-out-expo);
+		box-shadow: 0 1px 4px oklch(44% 0.26 280 / 0.2);
+	}
+
+	:global(.form-input) {
+		width: 100%;
+		border-radius: var(--radius-md);
+		border: 1px solid var(--color-border-strong);
+		background: var(--color-surface);
+		padding: 0.75rem 1rem;
+		color: var(--color-text);
+		font-size: 0.9375rem;
+		transition: border-color 0.2s ease, box-shadow 0.2s ease;
+		box-shadow: 0 1px 2px oklch(16% 0.02 280 / 0.03);
+	}
+
+	:global(.form-input::placeholder) {
+		color: var(--color-text-subtle);
+	}
+
+	:global(.form-input:focus) {
+		border-color: var(--color-primary);
+		box-shadow: 0 0 0 3px oklch(44% 0.26 280 / 0.08), 0 1px 2px oklch(16% 0.02 280 / 0.03);
+		outline: none;
+	}
+</style>

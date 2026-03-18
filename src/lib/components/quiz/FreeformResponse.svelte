@@ -22,7 +22,7 @@
 		loading = true;
 
 		try {
-			const res = await fetch('/api/comprehension/evaluate', {
+			const res = await fetch('/api/comprehension/freeform', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({

@@ -1,0 +1,320 @@
+1
+00:00:00,000 --> 00:00:05,720
+Welcome back, everyone, to Walmart
+Academy's The Art of Feedback. I’m Jamie,
+
+2
+00:00:05,720 --> 00:00:11,593
+alongside leadership expert Alex. In our
+last episode, we talked all about the
+
+3
+00:00:11,593 --> 00:00:17,237
+timing of feedback—catching those
+real-time moments. Today, we are tackling
+
+4
+00:00:17,237 --> 00:00:23,263
+the million-dollar question: How do we
+actually say the words without it turning
+
+5
+00:00:23,263 --> 00:00:25,246
+into a defensive argument?
+
+6
+00:00:25,918 --> 00:00:31,170
+[sighs] It is the toughest part of the
+job for so many leaders, Jamie. Because
+
+7
+00:00:31,170 --> 00:00:36,217
+feedback can easily get clouded by raw
+emotion, or misinterpretation. If we
+
+8
+00:00:36,217 --> 00:00:40,924
+aren't careful, a well-intentioned
+conversation can quickly go off the
+
+9
+00:00:40,924 --> 00:00:45,562
+rails. That is exactly why leaders have
+to use a structured approach.
+
+10
+00:00:46,051 --> 00:00:48,290
+We... need a blueprint!
+
+11
+00:00:48,896 --> 00:00:53,733
+[energetic] Exactly! And the absolute
+best blueprint out there is the SBI
+
+12
+00:00:53,733 --> 00:00:58,705
+feedback model. It is a simple, highly
+effective framework designed to make
+
+13
+00:00:58,705 --> 00:01:03,810
+feedback significantly clearer. It keeps
+the conversation strictly focused on
+
+14
+00:01:03,810 --> 00:01:08,110
+observable facts, rather than subjective
+assumptions or emotions.
+
+15
+00:01:08,713 --> 00:01:12,220
+[Enthusiastic] Which naturally dials down
+the defensiveness, I imagine?
+
+16
+00:01:12,847 --> 00:01:17,511
+Dramatically. [emphatic] By relying on
+this strict structure, you reduce
+
+17
+00:01:17,511 --> 00:01:21,978
+misinterpretation, drop the defensive
+shields, and pave the way for a
+
+18
+00:01:21,978 --> 00:01:24,343
+productive, growth-focused dialogue.
+
+19
+00:01:25,011 --> 00:01:29,246
+Okay, [surprised] I'm sold. What does SBI
+stand for?
+
+20
+00:01:29,905 --> 00:01:35,950
+[thoughtful] It stands for Situation,
+Behavior, and Impact. Let’s break them
+
+21
+00:01:35,950 --> 00:01:42,398
+down. First up is the "S"—Situation. You
+must define the exact "where" and "when"
+
+22
+00:01:42,398 --> 00:01:46,267
+of the situation you are discussing. Be
+specific.
+
+23
+00:01:46,984 --> 00:01:50,502
+So, what would be an ineffective way to
+do that?
+
+24
+00:01:51,178 --> 00:01:55,906
+An ineffective start sounds like this:
+[annoyed] "When dealing with customers,
+
+25
+00:01:55,906 --> 00:02:00,327
+you always act…" It's too broad, and
+words like "always" immediately make
+
+26
+00:02:00,327 --> 00:02:04,502
+people defensive, because it feels like
+an attack on their character.
+
+27
+00:02:05,003 --> 00:02:10,108
+[Enthusiastic] That makes sense. So, how
+do we fix it using the "Situation" step?
+
+28
+00:02:10,690 --> 00:02:15,299
+You anchor it in time and space. An
+effective example would be: [explaining]
+
+29
+00:02:15,299 --> 00:02:20,216
+"In our team meeting on Tuesday…" You've
+just established the factual setting. No
+
+30
+00:02:20,216 --> 00:02:22,736
+one can argue with Tuesday's team
+meeting.
+
+31
+00:02:23,287 --> 00:02:29,919
+[happy] Perfect. Okay, so we have our
+Situation. What is the "B"—Behavior?
+
+32
+00:02:30,632 --> 00:02:35,445
+[Cheeky] This is where you must describe
+the specific behavior that actually
+
+33
+00:02:35,445 --> 00:02:39,808
+occurred. Again, just the observable
+facts. What did you see or hear?
+
+34
+00:02:40,378 --> 00:02:45,865
+So, avoiding things like [annoyed] "you
+were being rude," which is an assumption,
+
+35
+00:02:45,865 --> 00:02:48,677
+and instead saying what they actually
+did?
+
+36
+00:02:49,217 --> 00:02:54,030
+[energetic] Exactly! Examples of
+observable behavior would be: crossing
+
+37
+00:02:54,030 --> 00:02:59,669
+arms, interrupting others, returning late
+from lunch, or walking by a spill and not
+
+38
+00:02:59,669 --> 00:03:04,826
+taking action. You are simply stating the
+action that took place within that
+
+39
+00:03:04,826 --> 00:03:06,133
+specific situation.
+
+40
+00:03:06,632 --> 00:03:13,734
+[clears throat] Alright, that brings us
+to the final piece: the "I"—Impact.
+
+41
+00:03:14,386 --> 00:03:18,818
+[emphatic] Yes. You have to clearly
+explain the impact that the behavior had
+
+42
+00:03:18,818 --> 00:03:23,368
+on you, the customer, or the business as
+a whole. This is the "why it matters"
+
+43
+00:03:23,368 --> 00:03:24,845
+part of the conversation.
+
+44
+00:03:25,346 --> 00:03:28,216
+[curious] Can you give us an example of a
+negative impact?
+
+45
+00:03:28,928 --> 00:03:33,525
+[thoughtful] Sure. Let's say the behavior
+was leaving equipment out. The impact
+
+46
+00:03:33,525 --> 00:03:38,005
+statement would be: [serious] "When
+ladders aren't secured, our customers are
+
+47
+00:03:38,005 --> 00:03:41,777
+put at risk." You connect the action
+directly to the consequence.
+
+48
+00:03:42,291 --> 00:03:47,969
+And we talked last episode about how
+important it is to reinforce positive
+
+49
+00:03:47,969 --> 00:03:51,158
+behavior, too. How does SBI work for
+that?
+
+50
+00:03:51,645 --> 00:03:56,032
+[thoughtful] It works beautifully for
+positive reinforcement! Let's say an
+
+51
+00:03:56,032 --> 00:04:00,780
+associate was doing a great job listening
+during a huddle. Your impact statement
+
+52
+00:04:00,780 --> 00:04:05,589
+might be: "When you make space for others
+to finish their thoughts, it helps them
+
+53
+00:04:05,589 --> 00:04:07,031
+feel heard and valued.".
+
+54
+00:04:07,668 --> 00:04:13,194
+[energetic] Situation, Behavior, Impact.
+It takes the guesswork and the emotion
+
+55
+00:04:13,194 --> 00:04:15,249
+entirely out of the equation.
+
+56
+00:04:15,916 --> 00:04:20,820
+[chuckles] It does. It transforms a
+stressful confrontation into a clear,
+
+57
+00:04:20,820 --> 00:04:26,268
+factual, and supportive conversation. Oh,
+and Jamie? One more thing before we go.
+
+58
+00:04:26,754 --> 00:04:30,103
+[laughs nervously] Uh oh. I don't like
+that tone.
+
+59
+00:04:30,704 --> 00:04:34,954
+[excited] Next up, it's test time. I
+highly hope you—and everyone
+
+60
+00:04:34,954 --> 00:04:37,411
+listening—have been paying attention.
+
+61
+00:04:37,962 --> 00:04:44,371
+Wait, a pop quiz?! [Cheeky] Is this going
+on my permanent record? I thought we were
+
+62
+00:04:44,371 --> 00:04:44,996
+friends!
+
+63
+00:04:45,685 --> 00:04:51,836
+[Cheeky] Consider this your "S"—the
+Situation. Next episode, we're testing
+
+64
+00:04:51,836 --> 00:04:53,353
+your "B"—Behavior.
+
+65
+00:04:53,864 --> 00:04:59,742
+[laughs nervously] And the "I" is going
+to be the Impact on my ego. [chuckles]
+
+66
+00:04:59,742 --> 00:05:04,475
+Alright, folks, grab your No. 2 pencils
+and cram while you can.
+

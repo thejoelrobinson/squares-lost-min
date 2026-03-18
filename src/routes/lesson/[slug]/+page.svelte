@@ -18,6 +18,7 @@
 		return 'podcast';
 	}
 
+	let isTest = $derived(data.lesson.slug.includes('test'));
 	let contentMode = $state<'podcast' | 'article'>('podcast');
 	let phaseOverride = $state<'podcast' | 'comprehension' | 'celebration' | 'reward' | null>(null);
 	let serverPhase = $derived(statusToPhase(data.progress?.status ?? 'available'));
@@ -32,12 +33,25 @@
 		data.allProgress.filter((p) => p.lesson_progress.puzzleEarned).length + 1
 	);
 
+	let nextLessonTitle = $derived(() => {
+		const currentPart = data.lesson.partNumber;
+		const next = data.allProgress.find((p) => p.lessons.partNumber === currentPart + 1);
+		return next?.lessons.title;
+	});
+
 	let currentLessonSlug = $derived(data.lesson.slug);
 	let lastSlug = $state('');
 	$effect(() => {
 		if (currentLessonSlug !== lastSlug) {
 			lastSlug = currentLessonSlug;
 			phaseOverride = null;
+		}
+	});
+
+	// Tests skip the podcast phase — go straight to comprehension
+	$effect(() => {
+		if (isTest && phase === 'podcast') {
+			onPodcastComplete();
 		}
 	});
 
@@ -96,59 +110,65 @@
 	<ProgressBar currentPhase={phase === 'celebration' ? 'reward' : phase} lessonTitle={data.lesson.title} />
 
 	{#if phase === 'podcast'}
-		<!-- Content mode toggle -->
-		<div class="mode-toggle-area">
-			<p class="mode-label">How would you like to learn?</p>
-			<div class="mode-toggle">
-				<button
-					type="button"
-					class="mode-option"
-					class:mode-option-active={contentMode === 'podcast'}
-					onclick={() => (contentMode = 'podcast')}
-				>
-					<svg class="mode-option-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-						<path stroke-linecap="round" stroke-linejoin="round"
-							d="M9 19V13a5 5 0 1 1 6 0v6M9 19a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h1m8 5a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2h-1" />
-					</svg>
-					Podcast
-				</button>
-				<button
-					type="button"
-					class="mode-option"
-					class:mode-option-active={contentMode === 'article'}
-					onclick={() => (contentMode = 'article')}
-				>
-					<svg class="mode-option-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-						<path stroke-linecap="round" stroke-linejoin="round"
-							d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-					</svg>
-					Article
-				</button>
-			</div>
-		</div>
-
-		{#if contentMode === 'podcast'}
-			<PodcastPlayer
-				src={content?.podcastFile ?? data.lesson.podcastUrl}
-				title={data.lesson.title}
-				episodeNumber={data.lesson.partNumber}
-				subtitles={content?.subtitles}
-				lessonSlug={data.lesson.slug}
-				onComplete={onPodcastComplete}
-			/>
+		{#if isTest}
+			<!-- Tests have no podcast phase -->
 		{:else}
-			<ArticleReader
-				slug={data.lesson.slug}
-				title={data.lesson.title}
-				partNumber={data.lesson.partNumber}
-				onComplete={onPodcastComplete}
-			/>
+			<!-- Content mode toggle -->
+			<div class="mode-toggle-area">
+				<p class="mode-label">How would you like to learn?</p>
+				<div class="mode-toggle">
+					<button
+						type="button"
+						class="mode-option"
+						class:mode-option-active={contentMode === 'podcast'}
+						onclick={() => (contentMode = 'podcast')}
+					>
+						<svg class="mode-option-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+							<path stroke-linecap="round" stroke-linejoin="round"
+								d="M9 19V13a5 5 0 1 1 6 0v6M9 19a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h1m8 5a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2h-1" />
+						</svg>
+						Podcast
+					</button>
+					<button
+						type="button"
+						class="mode-option"
+						class:mode-option-active={contentMode === 'article'}
+						onclick={() => (contentMode = 'article')}
+					>
+						<svg class="mode-option-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+							<path stroke-linecap="round" stroke-linejoin="round"
+								d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+						</svg>
+						Article
+					</button>
+				</div>
+			</div>
+
+			{#if contentMode === 'podcast'}
+				<PodcastPlayer
+					src={content?.podcastFile ?? data.lesson.podcastUrl}
+					title={data.lesson.title}
+					episodeNumber={data.lesson.partNumber}
+					subtitles={content?.subtitles}
+					lessonSlug={data.lesson.slug}
+					onComplete={onPodcastComplete}
+				/>
+			{:else}
+				<ArticleReader
+					slug={data.lesson.slug}
+					title={data.lesson.title}
+					partNumber={data.lesson.partNumber}
+					onComplete={onPodcastComplete}
+				/>
+			{/if}
 		{/if}
 	{:else if phase === 'comprehension'}
 		<ComprehensionCheck
 			lessonSlug={data.lesson.slug}
 			lessonId={data.lesson.id}
 			quiz={content?.quiz ?? []}
+			scenarioBriefing={content?.scenarioBriefing}
+			hasRoleplay={!!content?.jamieSystemPrompt}
 			onComplete={onComprehensionComplete}
 		/>
 	{:else if phase === 'celebration'}
@@ -160,11 +180,13 @@
 			heartsRemaining={quizHearts}
 			heartsTotal={3}
 			onContinue={onCelebrationContinue}
+			nextLessonTitle={nextLessonTitle()}
 		/>
 	{:else if phase === 'reward'}
 		<PuzzleReward
 			{earnedCount}
 			coinImage={content?.coinImage}
+			nextLessonTitle={nextLessonTitle()}
 			onContinue={async () => {
 				await onRewardComplete();
 				goto('/', { invalidateAll: true });

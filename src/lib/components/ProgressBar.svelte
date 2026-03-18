@@ -65,7 +65,7 @@
 		font-size: 0.75rem;
 		font-weight: 700;
 		color: var(--color-text-muted);
-		margin-bottom: 1.125rem;
+		margin-bottom: 2rem;
 		text-align: center;
 		text-transform: uppercase;
 		letter-spacing: 0.08em;
@@ -73,10 +73,11 @@
 
 	.pbar-track {
 		position: relative;
-		height: 7px;
-		background: var(--color-surface-raised);
+		height: 6px;
+		background: var(--color-surface-sunken);
 		border-radius: var(--radius-full);
 		margin-bottom: 2.25rem;
+		box-shadow: inset 0 1px 2px oklch(16% 0.02 280 / 0.06);
 	}
 
 	.pbar-fill {
@@ -87,6 +88,7 @@
 		background: linear-gradient(90deg, var(--color-success), var(--color-primary));
 		border-radius: var(--radius-full);
 		transition: width 0.6s var(--ease-out-expo);
+		box-shadow: 0 1px 4px oklch(44% 0.26 280 / 0.2);
 	}
 
 	.pbar-step {
@@ -107,28 +109,29 @@
 		align-items: center;
 		justify-content: center;
 		border: 3px solid var(--color-surface);
-		transition: all 0.4s var(--ease-spring);
+		transition: all 0.4s var(--ease-smooth);
 	}
 
 	.step-done {
 		background: var(--color-success);
 		color: white;
-		box-shadow: 0 3px 0 var(--color-success-dark);
+		box-shadow: 0 3px 0 var(--color-success-dark), 0 2px 8px oklch(58% 0.21 155 / 0.2);
 	}
 
 	.step-active {
-		background: var(--color-primary);
+		background: linear-gradient(145deg, oklch(48% 0.26 280), var(--color-primary));
 		color: white;
 		box-shadow:
 			0 3px 0 var(--color-primary-dark),
-			0 0 0 5px var(--color-primary-subtle);
+			0 0 0 5px var(--color-primary-subtle),
+			0 4px 12px oklch(44% 0.26 280 / 0.2);
 		animation: step-breathe 2.2s ease-in-out infinite;
 	}
 
 	.step-next {
 		background: var(--color-surface-raised);
 		color: var(--color-text-subtle);
-		box-shadow: 0 2px 0 var(--color-border-strong);
+		box-shadow: 0 2px 0 var(--color-border-strong), inset 0 1px 2px oklch(100% 0 0 / 0.5);
 	}
 
 	.step-ico { width: 1rem; height: 1rem; }

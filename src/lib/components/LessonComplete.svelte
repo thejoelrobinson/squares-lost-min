@@ -11,6 +11,7 @@
 		heartsRemaining: number;
 		heartsTotal: number;
 		onContinue: () => void;
+		nextLessonTitle?: string;
 	}
 
 	let {
@@ -20,12 +21,14 @@
 		questionsTotal,
 		heartsRemaining,
 		heartsTotal,
-		onContinue
+		onContinue,
+		nextLessonTitle
 	}: Props = $props();
 
 	let mounted = $state(false);
 	let barFilled = $state(false);
 	let statsVisible = $state(false);
+	let ctaVisible = $state(false);
 
 	$effect(() => {
 		const t1 = requestAnimationFrame(() => {
@@ -34,10 +37,12 @@
 		});
 		const t2 = setTimeout(() => { barFilled = true; }, 500);
 		const t3 = setTimeout(() => { statsVisible = true; }, 1100);
+		const t4 = setTimeout(() => { ctaVisible = true; }, 1300);
 		return () => {
 			cancelAnimationFrame(t1);
 			clearTimeout(t2);
 			clearTimeout(t3);
+			clearTimeout(t4);
 		};
 	});
 </script>
@@ -95,8 +100,14 @@
 		</div>
 	</div>
 
-	<div class="cel-cta" class:cel-stats-in={statsVisible}>
-		<Button onclick={onContinue} size="lg" variant="success">Claim Spark Point</Button>
+	<div class="cel-cta" class:cel-cta-in={ctaVisible}>
+		<Button onclick={onContinue} size="lg" variant="cta" fullWidth>Claim Spark Point</Button>
+		{#if nextLessonTitle}
+			<p class="cel-next">
+				<span class="cel-next-label">Up next</span>
+				<span class="cel-next-title">{nextLessonTitle}</span>
+			</p>
+		{/if}
 	</div>
 </div>
 
@@ -108,13 +119,16 @@
 		gap: 1rem;
 		padding: 2.5rem 1.5rem 2rem;
 		background: var(--color-surface);
-		border: 2px solid var(--color-border);
+		border: 1px solid oklch(0% 0 0 / 0.05);
 		border-bottom-width: 4px;
 		border-bottom-color: var(--color-border-strong);
 		border-radius: var(--radius-2xl);
+		box-shadow:
+			0 4px 16px oklch(16% 0.02 280 / 0.06),
+			0 12px 40px oklch(16% 0.02 280 / 0.04);
 		opacity: 0;
 		transform: translateY(20px) scale(0.97);
-		transition: opacity 0.5s var(--ease-out-expo), transform 0.6s var(--ease-spring);
+		transition: opacity 0.5s var(--ease-out-expo), transform 0.6s var(--ease-bounce);
 	}
 	.cel-in { opacity: 1; transform: translateY(0) scale(1); }
 
@@ -140,6 +154,7 @@
 		justify-content: center;
 		border-bottom: 4px solid var(--color-accent-dark);
 		position: relative;
+		box-shadow: 0 4px 16px oklch(78% 0.155 70 / 0.3), 0 1px 4px oklch(16% 0.02 280 / 0.1);
 	}
 
 	.trophy-icon { width: 2rem; height: 2rem; color: white; }
@@ -169,13 +184,13 @@
 		gap: 1rem;
 		padding: 1rem 1.5rem;
 		border-radius: var(--radius-xl);
-		background: var(--color-surface-raised);
-		border: 2px solid var(--color-border);
+		background: linear-gradient(135deg, oklch(78% 0.155 70 / 0.06) 0%, oklch(78% 0.155 70 / 0.02) 100%);
+		border: 1px solid oklch(78% 0.155 70 / 0.12);
 		border-bottom-width: 3px;
-		border-bottom-color: var(--color-border-strong);
+		border-bottom-color: oklch(78% 0.155 70 / 0.15);
 		opacity: 0;
 		transform: scale(0.85);
-		transition: opacity 0.4s ease, transform 0.5s var(--ease-spring);
+		transition: opacity 0.4s ease, transform 0.5s var(--ease-bounce);
 	}
 	.cel-spark-in { opacity: 1; transform: scale(1); }
 
@@ -217,7 +232,7 @@
 		max-width: 20rem;
 		opacity: 0;
 		transform: translateY(10px);
-		transition: opacity 0.4s ease, transform 0.5s var(--ease-spring);
+		transition: opacity 0.4s ease, transform 0.5s var(--ease-bounce);
 	}
 	.cel-stats-in { opacity: 1; transform: translateY(0); }
 
@@ -229,7 +244,8 @@
 		padding: 0.875rem 0.5rem;
 		border-radius: var(--radius-lg);
 		background: var(--color-surface-raised);
-		border: 2px solid var(--color-border);
+		border: 1px solid var(--color-border);
+		box-shadow: 0 1px 3px oklch(16% 0.02 280 / 0.04);
 	}
 
 	.stat-num {
@@ -262,8 +278,36 @@
 	/* ── CTA ── */
 	.cel-cta {
 		margin-top: 0.5rem;
+		width: 100%;
+		max-width: 20rem;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1rem;
 		opacity: 0;
 		transform: translateY(10px);
-		transition: opacity 0.4s ease 0.1s, transform 0.5s var(--ease-spring) 0.1s;
+		transition: opacity 0.4s ease, transform 0.5s var(--ease-bounce);
+	}
+	.cel-cta-in { opacity: 1; transform: translateY(0); }
+
+	.cel-next {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.125rem;
+	}
+
+	.cel-next-label {
+		font-size: 0.6875rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: var(--color-text-muted);
+	}
+
+	.cel-next-title {
+		font-size: 0.8125rem;
+		font-weight: 600;
+		color: var(--color-primary);
 	}
 </style>

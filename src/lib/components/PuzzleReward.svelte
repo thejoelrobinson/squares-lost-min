@@ -8,9 +8,10 @@
 		totalCount?: number;
 		coinImage?: string;
 		onContinue: () => void;
+		nextLessonTitle?: string;
 	}
 
-	let { earnedCount, totalCount = 9, coinImage, onContinue }: Props = $props();
+	let { earnedCount, totalCount = 9, coinImage, onContinue, nextLessonTitle }: Props = $props();
 
 	let mounted = $state(false);
 
@@ -48,7 +49,17 @@
 			{/each}
 		</div>
 
-		<Button onclick={onContinue} size="lg" variant="success">Continue</Button>
+		<div class="reward-cta">
+			<Button onclick={onContinue} size="lg" variant="cta" fullWidth>
+				{nextLessonTitle ? 'Next Lesson' : 'Back to Lessons'}
+			</Button>
+			{#if nextLessonTitle}
+				<p class="reward-next">
+					<span class="reward-next-label">Up next</span>
+					<span class="reward-next-title">{nextLessonTitle}</span>
+				</p>
+			{/if}
+		</div>
 	</div>
 </div>
 
@@ -60,8 +71,9 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: oklch(16% 0.02 280 / 0.65);
-		backdrop-filter: blur(12px);
+		background: oklch(16% 0.02 280 / 0.55);
+		backdrop-filter: blur(20px) saturate(1.2);
+		-webkit-backdrop-filter: blur(20px) saturate(1.2);
 		animation: overlay-in 0.4s var(--ease-out-expo);
 		padding: 1rem;
 	}
@@ -81,13 +93,22 @@
 		width: 100%;
 		padding: 2.5rem 2rem 2rem;
 		background: var(--color-surface);
-		border: 2px solid var(--color-border);
+		border: 1px solid oklch(0% 0 0 / 0.06);
 		border-bottom-width: 4px;
 		border-bottom-color: var(--color-border-strong);
 		border-radius: var(--radius-2xl);
-		box-shadow: var(--shadow-xl);
+		box-shadow:
+			0 24px 80px oklch(16% 0.02 280 / 0.2),
+			0 8px 24px oklch(16% 0.02 280 / 0.1),
+			0 2px 6px oklch(16% 0.02 280 / 0.06);
 		text-align: center;
 		overflow: hidden;
+		animation: card-enter 0.5s var(--ease-bounce);
+	}
+
+	@keyframes card-enter {
+		from { transform: translateY(24px) scale(0.95); opacity: 0; }
+		to { transform: translateY(0) scale(1); opacity: 1; }
 	}
 
 	.reward-glow {
@@ -194,5 +215,37 @@
 				calc(sin(calc(var(--dot-index) * 22.5deg)) * 140px - 50px)
 			) scale(0.4);
 		}
+	}
+
+	/* ── CTA ── */
+	.reward-cta {
+		width: 100%;
+		max-width: 18rem;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1rem;
+		position: relative;
+	}
+
+	.reward-next {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.125rem;
+	}
+
+	.reward-next-label {
+		font-size: 0.6875rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: var(--color-text-muted);
+	}
+
+	.reward-next-title {
+		font-size: 0.8125rem;
+		font-weight: 600;
+		color: var(--color-primary);
 	}
 </style>
