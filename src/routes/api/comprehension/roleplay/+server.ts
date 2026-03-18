@@ -1,9 +1,25 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getUserById, getLessonBySlug } from '$lib/server/db/queries';
-import { lessonContent } from '$lib/content/lesson-data';
+import { lessonContent, type LessonContent } from '$lib/content/lesson-data';
 import { evaluateComprehension } from '$lib/server/llm';
 import { env } from '$env/dynamic/private';
+
+function buildConversationPrompt(content: LessonContent | undefined): string {
+	if (!content) return 'You are Jamie, a friendly learning coach. Have a Socratic conversation to check the learner\'s understanding of what they just learned. Ask questions, probe their thinking, and wrap up after 4-6 turns with [DONE].';
+	const objectives = content.objectives.map((o) => `- ${o}`).join('\n');
+	return `You are Jamie, a friendly learning coach having a short Socratic conversation to check the learner's understanding of "${content.title}".
+
+## Learning Objectives
+${objectives}
+
+## Instructions
+- Ask open-ended questions that probe understanding of the objectives above
+- Acknowledge correct answers warmly and build on them
+- Gently redirect misunderstandings with a follow-up question
+- Keep responses concise (2-3 sentences max)
+- After 4-6 meaningful exchanges, wrap up with a brief summary and append [DONE] at the end of your final message`;
+}
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 const DEFAULT_MODEL = 'google/gemini-2.0-flash-001';
@@ -48,9 +64,7 @@ async function handleMessage(
 	if (!lesson) error(404, 'Lesson not found');
 
 	const content = lessonContent[lessonSlug];
-	if (!content?.jamieSystemPrompt) {
-		error(400, 'Lesson does not support roleplay');
-	}
+	const systemPrompt = content?.jamieSystemPrompt ?? buildConversationPrompt(content);
 
 	if (!env.OPENROUTER_API_KEY) {
 		// Use conversation turn count to pick the next dev reply
@@ -71,7 +85,7 @@ async function handleMessage(
 		body: JSON.stringify({
 			model,
 			messages: [
-				{ role: 'system', content: content.jamieSystemPrompt },
+				{ role: 'system', content: systemPrompt },
 				...history,
 				{ role: 'user', content: message }
 			]
