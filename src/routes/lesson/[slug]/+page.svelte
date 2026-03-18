@@ -171,7 +171,7 @@
 			lessonId={data.lesson.id}
 			quiz={content?.quiz ?? []}
 			scenarioBriefing={content?.scenarioBriefing}
-			hasRoleplay={!!content?.jamieSystemPrompt}
+			hasRoleplay={!!content?.hasRoleplay}
 			onComplete={onComprehensionComplete}
 		/>
 	{:else if phase === 'celebration'}

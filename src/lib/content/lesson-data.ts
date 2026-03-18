@@ -10,6 +10,7 @@ export interface LessonContent {
 	quiz: QuizQuestion[];
 	subtitles?: SubtitleCue[];
 	coinImage?: string;
+	hasRoleplay?: boolean;
 	scenarioBriefing?: string;
 	jamieSystemPrompt?: string;
 	scenarioEvaluationObjectives?: string[];
@@ -47,6 +48,7 @@ export const lessonContent: Record<string, LessonContent> = {
 	},
 	'test-1': {
 		...test1,
+		hasRoleplay: true,
 		podcastFile: ''
 	},
 	'reading-the-room': {
