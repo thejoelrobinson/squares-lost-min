@@ -457,4 +457,5 @@
 		box-shadow: 0 0 0 3px oklch(44% 0.26 280 / 0.08), 0 1px 2px oklch(16% 0.02 280 / 0.03);
 		outline: none;
 	}
+
 </style>

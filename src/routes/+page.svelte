@@ -2,7 +2,10 @@
 	import LessonMap from '$lib/components/LessonMap.svelte';
 	import SparkCoin from '$lib/components/SparkCoin.svelte';
 	import Button from '$lib/components/Button.svelte';
+	import WelcomeTour from '$lib/components/WelcomeTour.svelte';
 	import { lessonContent } from '$lib/content/lesson-data';
+
+	let welcomeTour: ReturnType<typeof WelcomeTour> | undefined = $state(undefined);
 
 	let { data } = $props();
 
@@ -62,6 +65,8 @@
 
 <svelte:head><title>FeedbackLoop</title></svelte:head>
 
+<WelcomeTour bind:this={welcomeTour} />
+
 <div class="page-root">
 	<!-- Hero -->
 	<div class="hero-content">
@@ -78,6 +83,17 @@
 
 		<!-- Stats row -->
 		<div class="stats-row">
+			<button
+				type="button"
+				class="stat-pill stat-pill-help"
+				onclick={() => welcomeTour?.reset()}
+				aria-label="Show feature tour"
+			>
+				<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M12 18h.01" />
+				</svg>
+				<span class="stat-unit">Tour</span>
+			</button>
 			<div class="stat-pill">
 				<span class="stat-icon stat-icon-lessons">
 					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -210,6 +226,24 @@
 
 	.stat-pill-streak .stat-num {
 		color: var(--color-accent-dark);
+	}
+
+	.stat-pill-help {
+		cursor: pointer;
+		transition: border-color 0.15s ease, color 0.15s ease;
+	}
+
+	.stat-pill-help:hover {
+		border-color: var(--color-primary-light);
+		color: var(--color-primary);
+	}
+
+	.stat-pill-help svg {
+		color: var(--color-text-muted);
+	}
+
+	.stat-pill-help:hover svg {
+		color: var(--color-primary);
 	}
 
 	.stat-flame {

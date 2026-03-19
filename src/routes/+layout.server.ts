@@ -1,5 +1,5 @@
 import type { LayoutServerLoad } from './$types';
-import { getUserById, getProgressForUser } from '$lib/server/db/queries';
+import { getUserById, getProgressForUser, getAllLessons } from '$lib/server/db/queries';
 import { db } from '$lib/server/db';
 import { users } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
@@ -15,11 +15,14 @@ function getYesterdayDate(): string {
 }
 
 export const load: LayoutServerLoad = async ({ locals }) => {
-	if (!locals.userId) return { user: null, sparkCount: 0, streak: 0, xp: 0 };
+	if (!locals.userId) return { user: null, sparkCount: 0, streak: 0, xp: 0, allLessons: [] };
 	const user = await getUserById(locals.userId);
-	if (!user) return { user: null, sparkCount: 0, streak: 0, xp: 0 };
+	if (!user) return { user: null, sparkCount: 0, streak: 0, xp: 0, allLessons: [] };
 
-	const allProgress = await getProgressForUser(locals.userId);
+	const [allProgress, allLessons] = await Promise.all([
+		getProgressForUser(locals.userId),
+		getAllLessons()
+	]);
 	const sparkCount = allProgress.filter((p) => p.lesson_progress.puzzleEarned).length;
 
 	// Streak logic
@@ -45,6 +48,7 @@ export const load: LayoutServerLoad = async ({ locals }) => {
 		user: user ?? null,
 		sparkCount,
 		streak,
-		xp: user.xp ?? 0
+		xp: user.xp ?? 0,
+		allLessons: allLessons.map((l) => ({ partNumber: l.partNumber, title: l.title, slug: l.slug }))
 	};
 };

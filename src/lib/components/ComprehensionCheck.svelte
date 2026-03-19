@@ -316,13 +316,13 @@
 						</Card>
 					</div>
 				{:else}
-					<!-- Voice not available — fall back to text chat -->
-					<ScenarioChat {lessonSlug} onComplete={handleConversationComplete} />
+					<!-- Voice not available — go directly to text VoiceChat as fallback -->
+					<VoiceChat {lessonId} {lessonSlug} onComplete={handleConversationComplete} />
 				{/if}
 			{:else if conversationMode === 'voice'}
 				<VoiceChat {lessonId} {lessonSlug} onComplete={handleConversationComplete} />
 			{:else if conversationMode === 'text'}
-				<ScenarioChat {lessonSlug} onComplete={handleConversationComplete} />
+				<VoiceChat {lessonId} {lessonSlug} onComplete={handleConversationComplete} />
 			{/if}
 		{/if}
 	{/if}

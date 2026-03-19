@@ -1,6 +1,7 @@
 <script lang="ts">
+	import { slide } from 'svelte/transition';
+	import { cubicOut } from 'svelte/easing';
 	import type { SubtitleCue } from '$lib/types';
-	import SparkIcon from '$lib/components/SparkIcon.svelte';
 	import SyncedTranscript from '$lib/components/SyncedTranscript.svelte';
 	import PodcastAsk from '$lib/components/PodcastAsk.svelte';
 	import Button from '$lib/components/Button.svelte';
@@ -22,7 +23,7 @@
 	let currentTime = $state(0);
 	let duration = $state(0);
 	let playbackRate = $state(1);
-	let showTranscript = $state(false);
+	let showTranscript = $state(true);
 	let hasListened = $state(false);
 	let isSeeking = $state(false);
 	let askOpen = $state(false);
@@ -59,9 +60,9 @@
 		else audioEl.play();
 	}
 
-	function openAsk() {
-		if (audioEl && playing) audioEl.pause();
-		askOpen = true;
+	function toggleAsk() {
+		if (!askOpen && audioEl && playing) audioEl.pause();
+		askOpen = !askOpen;
 	}
 
 	function closeAsk() {
@@ -144,25 +145,33 @@
 		onended={handleEnded}
 	></audio>
 
-	<!-- Cover Art -->
-	<div class="cover-art" class:cover-playing={playing}>
-		<div class="cover-gradient"></div>
-		<div class="cover-pattern"></div>
-		<div class="cover-content">
-			<div class="cover-icon-wrap">
-				<SparkIcon size={56} class="cover-spark" />
+	<!-- Transcript area -->
+	{#if showTranscript}
+		{#if subtitles && subtitles.length > 0}
+			<div class="transcript-area">
+				<SyncedTranscript cues={subtitles} {currentTime} onSeek={seekTo} />
 			</div>
-			<div class="cover-meta">
-				<p class="cover-label">Walmart Academy<br/>The Art of Feedback</p>
-				<p class="cover-episode">Episode {episodeNumber}</p>
+		{:else}
+			<div class="transcript-area transcript-empty">
+				<p>No transcript available.</p>
 			</div>
-		</div>
+		{/if}
+	{/if}
+
+	<!-- Waveform -->
+	<div class="waveform" class:waveform-playing={playing}>
+		{#each { length: 24 } as _, i (i)}
+			<div
+				class="waveform-bar"
+				style="animation-delay: {i * 0.07}s; animation-duration: {1.6 + (((i * 7) % 11) / 11) * 0.6}s"
+			></div>
+		{/each}
 	</div>
 
 	<!-- Title -->
 	<div class="player-title-area">
 		<h2 class="player-title">{title}</h2>
-		<p class="player-subtitle">Walmart Academy · The Art of Feedback</p>
+		<p class="player-subtitle">Episode {episodeNumber} · Walmart Academy · The Art of Feedback</p>
 	</div>
 
 	<!-- Seekbar -->
@@ -196,6 +205,48 @@
 			<span>-{formatTime(remaining)}</span>
 		</div>
 	</div>
+
+	<!-- Ask Jamie — prominent voice CTA -->
+	{#if lessonSlug}
+		<div class="ask-jamie-area">
+			<button
+				type="button"
+				class="ask-jamie-btn"
+				class:ask-jamie-btn-active={askOpen}
+				onclick={toggleAsk}
+				aria-label="Ask Jamie a question"
+				aria-expanded={askOpen}
+			>
+				<div class="ask-jamie-icon">
+					<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
+					</svg>
+				</div>
+				<div class="ask-jamie-text">
+					<span class="ask-jamie-label">Ask Jamie</span>
+					<span class="ask-jamie-desc">Got a question? Talk it through.</span>
+				</div>
+				<svg
+					class="ask-jamie-arrow"
+					class:ask-jamie-arrow-open={askOpen}
+					fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"
+				>
+					<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+				</svg>
+			</button>
+
+			<!-- Ask panel drawer -->
+			{#if askOpen}
+				<div transition:slide={{ duration: 250, easing: cubicOut }}>
+					<PodcastAsk
+						lessonSlug={lessonSlug!}
+						{transcriptContext}
+						onDismiss={closeAsk}
+					/>
+				</div>
+			{/if}
+		</div>
+	{/if}
 
 	<!-- Transport -->
 	<div class="transport">
@@ -233,22 +284,6 @@
 			{playbackRate}x
 		</button>
 
-		{#if lessonSlug}
-			<button
-				type="button"
-				class="action-chip"
-				class:action-chip-active={askOpen}
-				onclick={openAsk}
-				aria-label="Ask a question"
-				aria-expanded={askOpen}
-			>
-				<svg class="action-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-					<path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
-				</svg>
-				Ask
-			</button>
-		{/if}
-
 		<button
 			type="button"
 			class="action-chip"
@@ -263,28 +298,6 @@
 			Transcript
 		</button>
 	</div>
-
-	<!-- Ask panel -->
-	{#if askOpen}
-		<PodcastAsk
-			lessonSlug={lessonSlug!}
-			{transcriptContext}
-			onDismiss={closeAsk}
-		/>
-	{/if}
-
-	<!-- Transcript area -->
-	{#if showTranscript}
-		{#if subtitles && subtitles.length > 0}
-			<div class="transcript-area">
-				<SyncedTranscript cues={subtitles} {currentTime} onSeek={seekTo} />
-			</div>
-		{:else}
-			<div class="transcript-area transcript-empty">
-				<p>No transcript available.</p>
-			</div>
-		{/if}
-	{/if}
 
 	<!-- Continue button -->
 	{#if hasListened}
@@ -308,84 +321,41 @@
 		width: 100%;
 	}
 
-	/* ── Cover Art ── */
-	.cover-art {
-		position: relative;
-		width: 14rem;
-		aspect-ratio: 1;
-		margin: 0 auto 1.75rem;
-		border-radius: var(--radius-2xl);
-		overflow: hidden;
-		box-shadow:
-			0 8px 32px oklch(16% 0.02 280 / 0.15),
-			0 2px 8px oklch(16% 0.02 280 / 0.08);
-		transition: transform 0.6s var(--ease-out-expo), box-shadow 0.6s var(--ease-out-expo);
-	}
-
-	.cover-playing {
-		transform: scale(1.03);
-		box-shadow:
-			0 12px 40px oklch(44% 0.26 280 / 0.2),
-			0 4px 12px oklch(16% 0.02 280 / 0.1),
-			0 0 0 1px oklch(44% 0.26 280 / 0.08);
-	}
-
-	.cover-gradient {
-		position: absolute;
-		inset: 0;
-		background: linear-gradient(135deg, var(--color-secondary), var(--color-primary), var(--color-primary-light));
-	}
-
-	.cover-pattern {
-		position: absolute;
-		inset: 0;
-		opacity: 0.06;
-		background-image:
-			radial-gradient(circle at 25% 25%, white 1.5px, transparent 1.5px),
-			radial-gradient(circle at 75% 75%, white 1px, transparent 1px);
-		background-size: 32px 32px;
-	}
-
-	.cover-content {
-		position: absolute;
-		inset: 0;
+	/* ── Waveform ── */
+	.waveform {
 		display: flex;
-		flex-direction: column;
-		align-items: center;
+		align-items: flex-end;
 		justify-content: center;
-		gap: 1rem;
-		backdrop-filter: blur(40px) saturate(1.8);
-		-webkit-backdrop-filter: blur(40px) saturate(1.8);
-		background: oklch(100% 0 0 / 0.06);
+		gap: 3px;
+		height: 4rem;
+		padding: 0 1rem;
+		margin-bottom: 1.25rem;
 	}
 
-	.cover-icon-wrap {
-		position: relative;
-		color: var(--color-accent);
-		filter: drop-shadow(0 4px 12px oklch(82% 0.16 75 / 0.4));
+	.waveform-bar {
+		width: 3px;
+		height: 100%;
+		border-radius: var(--radius-full);
+		background: linear-gradient(to top, var(--color-primary), var(--color-primary-light));
+		transform-origin: bottom;
+		transform: scaleY(0.08);
+		transition: transform 0.4s var(--ease-smooth);
 	}
 
-	.cover-meta {
-		text-align: center;
+	.waveform-playing .waveform-bar {
+		animation: bar-dance var(--ease-in-out-smooth, ease-in-out) infinite;
 	}
 
-	.cover-label {
-		font-family: 'Outfit', system-ui, sans-serif;
-		font-size: 0.625rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.14em;
-		color: oklch(100% 0 0 / 0.45);
-		line-height: 1.5;
+	.waveform-playing {
+		filter: drop-shadow(0 0 12px oklch(44% 0.26 280 / 0.15));
+		transition: filter 0.6s var(--ease-out-expo);
 	}
 
-	.cover-episode {
-		font-family: 'Bricolage Grotesque', system-ui, sans-serif;
-		font-size: 1rem;
-		font-weight: 800;
-		color: white;
-		margin-top: 0.375rem;
-		letter-spacing: -0.02em;
+	@keyframes bar-dance {
+		0%, 100% { transform: scaleY(0.12); }
+		20% { transform: scaleY(0.65); }
+		45% { transform: scaleY(0.3); }
+		70% { transform: scaleY(0.85); }
 	}
 
 	/* ── Title ── */
@@ -612,6 +582,94 @@
 	.action-icon {
 		width: 0.875rem;
 		height: 0.875rem;
+	}
+
+	/* ── Ask Jamie CTA ── */
+	.ask-jamie-area {
+		margin-bottom: 1.25rem;
+	}
+
+	.ask-jamie-btn {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		width: 100%;
+		padding: 0.75rem 1rem;
+		border-radius: var(--radius-xl);
+		border: 1.5px solid var(--color-border);
+		background: var(--color-surface);
+		cursor: pointer;
+		text-align: left;
+		transition: all 0.2s var(--ease-smooth);
+	}
+
+	.ask-jamie-btn:hover {
+		border-color: var(--color-primary-light);
+		box-shadow: 0 2px 12px oklch(44% 0.26 280 / 0.1);
+		transform: translateY(-1px);
+	}
+
+	.ask-jamie-btn:active {
+		transform: translateY(0);
+	}
+
+	.ask-jamie-btn-active {
+		border-color: var(--color-primary-light);
+		background: var(--color-primary-subtle);
+	}
+
+	.ask-jamie-icon {
+		width: 2.25rem;
+		height: 2.25rem;
+		border-radius: 50%;
+		background: var(--color-primary-subtle);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+	}
+
+	.ask-jamie-icon svg {
+		width: 1.25rem;
+		height: 1.25rem;
+		color: var(--color-primary);
+	}
+
+	.ask-jamie-text {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		min-width: 0;
+	}
+
+	.ask-jamie-label {
+		font-size: 0.875rem;
+		font-weight: 700;
+		color: var(--color-text);
+	}
+
+	.ask-jamie-desc {
+		font-size: 0.6875rem;
+		color: var(--color-text-muted);
+		margin-top: 0.0625rem;
+	}
+
+	.ask-jamie-arrow {
+		width: 1rem;
+		height: 1rem;
+		color: var(--color-text-muted);
+		flex-shrink: 0;
+		transition: transform 0.2s var(--ease-smooth), color 0.15s ease;
+	}
+
+	.ask-jamie-arrow-open {
+		transform: rotate(180deg);
+		color: var(--color-primary);
+	}
+
+	.ask-jamie-btn:hover .ask-jamie-arrow:not(.ask-jamie-arrow-open) {
+		transform: translateY(2px);
+		color: var(--color-primary);
 	}
 
 	/* ── Transcript ── */

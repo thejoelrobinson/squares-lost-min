@@ -173,7 +173,7 @@
 				{/if}
 			</div>
 
-			<!-- Floating Ask Sam trigger — always visible while reading -->
+			<!-- Floating Ask Jamie trigger — always visible while reading -->
 			<div class="absolute bottom-4 right-4 z-20">
 				{#if pinging}
 					<span
@@ -185,7 +185,7 @@
 					type="button"
 					class="relative flex cursor-pointer items-center gap-2 rounded-full bg-gradient-to-r from-primary to-secondary px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:scale-105 hover:shadow-xl hover:shadow-primary/40 active:scale-95"
 					onclick={() => (askOpen = true)}
-					aria-label="Ask a question about this article"
+					aria-label="Ask Jamie a question about this article"
 				>
 					<svg
 						class="h-4 w-4 shrink-0"
@@ -197,10 +197,10 @@
 						<path
 							stroke-linecap="round"
 							stroke-linejoin="round"
-							d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"
+							d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"
 						/>
 					</svg>
-					Ask a Question
+					Ask Jamie
 				</button>
 			</div>
 

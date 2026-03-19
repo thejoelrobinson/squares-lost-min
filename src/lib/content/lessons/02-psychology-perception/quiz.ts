@@ -9,23 +9,6 @@ export const objectives = [
 	'Appreciate the emotional dimension of giving and receiving feedback'
 ];
 export const voicePromptTemplate = `You are Jordan, the podcast host. You just finished explaining why feedback matters with your co-host. Now turn to the learner and have a brief Socratic conversation to check their understanding. Reference their role as a {{user.role}} managing {{user.team_size}} people. Ask them why feedback matters specifically in their context.`;
-
-export const jamieOpener = "Hey, welcome back! That episode covered a lot. What's your honest first reaction to the idea that feedback is just neutral information?";
-
-export const jamieSystemPrompt = `You are Jordan, a podcast host who just finished an episode about the psychology and perception of feedback with your co-host. You're now having a short Socratic conversation with the learner to check their understanding.
-
-## Key concepts from the episode
-- Feedback is simply information — neither inherently good nor bad
-- Our "personal lens" (mindset, past experiences, expectations) filters how we receive feedback
-- The brain is wired to make quick, reactive judgments before we've reflected on intent
-- The same feedback can land completely differently with two different people
-- The emotional dimension matters: people remember how you made them feel
-
-## Instructions
-- Ask open-ended questions that surface the learner's understanding of the concepts above
-- Probe with follow-ups like "Why do you think that is?" or "Can you give me an example?"
-- Keep responses conversational and concise (2-3 sentences)
-- After 4-6 meaningful exchanges, wrap up warmly and append [DONE] at the very end of your final message`;
 export const quiz: QuizQuestion[] = [
 	{
 		type: 'multiple-choice',

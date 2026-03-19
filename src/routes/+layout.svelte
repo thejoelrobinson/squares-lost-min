@@ -3,7 +3,7 @@
 	import favicon from '$lib/assets/favicon.svg';
 	import SparkCoin from '$lib/components/SparkCoin.svelte';
 	import SoundToggle from '$lib/components/SoundToggle.svelte';
-	import { onNavigate } from '$app/navigation';
+	import { onNavigate, goto, invalidateAll } from '$app/navigation';
 	import { navigating } from '$app/stores';
 	import type { LayoutData } from './$types';
 
@@ -16,6 +16,64 @@
 	);
 
 	let streak = $derived((data as Record<string, unknown>).streak as number ?? 0);
+
+	// Settings panel state
+	let settingsOpen = $state(false);
+	let confirmingReset = $state(false);
+	let jumpOpen = $state(false);
+	let busy = $state(false);
+
+	function toggleSettings() {
+		settingsOpen = !settingsOpen;
+		if (!settingsOpen) {
+			confirmingReset = false;
+			jumpOpen = false;
+		}
+	}
+
+	function closeSettings() {
+		settingsOpen = false;
+		confirmingReset = false;
+		jumpOpen = false;
+	}
+
+	async function handleReset() {
+		if (!confirmingReset) {
+			confirmingReset = true;
+			return;
+		}
+		busy = true;
+		try {
+			const res = await fetch('/api/settings/reset', { method: 'POST' });
+			if (res.ok) {
+				closeSettings();
+				await invalidateAll();
+				await goto('/');
+			}
+		} finally {
+			busy = false;
+			confirmingReset = false;
+		}
+	}
+
+	async function handleJump(partNumber: number) {
+		busy = true;
+		try {
+			const res = await fetch('/api/settings/jump', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ partNumber })
+			});
+			if (res.ok) {
+				const { slug } = await res.json();
+				closeSettings();
+				await invalidateAll();
+				await goto(`/lesson/${slug}`);
+			}
+		} finally {
+			busy = false;
+		}
+	}
 
 	onNavigate((navigation) => {
 		if (!document.startViewTransition) return;
@@ -87,8 +145,82 @@
 					<span class="chip-value">{sparkCount}</span>
 				</a>
 
-				<div class="nav-avatar">
-					<span class="avatar-letter">{data.user.name.charAt(0).toUpperCase()}</span>
+				<div class="avatar-wrap">
+					<button
+						type="button"
+						class="nav-avatar"
+						class:nav-avatar-active={settingsOpen}
+						onclick={toggleSettings}
+						aria-label="Settings"
+						aria-expanded={settingsOpen}
+					>
+						<span class="avatar-letter">{data.user.name.charAt(0).toUpperCase()}</span>
+					</button>
+
+					{#if settingsOpen}
+						<!-- svelte-ignore a11y_no_static_element_interactions -->
+						<div class="settings-backdrop" onclick={closeSettings} onkeydown={() => {}}></div>
+						<div class="settings-panel">
+							<div class="settings-header">
+								<span class="settings-title">Settings</span>
+							</div>
+
+							<!-- Jump to Lesson -->
+							<button
+								type="button"
+								class="settings-item"
+								onclick={() => (jumpOpen = !jumpOpen)}
+								disabled={busy}
+							>
+								<svg class="settings-item-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+								</svg>
+								Jump to lesson
+								<svg
+									class="settings-chevron"
+									class:settings-chevron-open={jumpOpen}
+									fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"
+								>
+									<path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+								</svg>
+							</button>
+
+							{#if jumpOpen}
+								<div class="jump-list">
+									{#each data.allLessons as lesson (lesson.partNumber)}
+										<button
+											type="button"
+											class="jump-item"
+											onclick={() => handleJump(lesson.partNumber)}
+											disabled={busy}
+										>
+											<span class="jump-num">{lesson.partNumber}</span>
+											<span class="jump-title">{lesson.title}</span>
+										</button>
+									{/each}
+								</div>
+							{/if}
+
+							<div class="settings-divider"></div>
+
+							<!-- Reset -->
+							<button
+								type="button"
+								class="settings-item settings-item-danger"
+								onclick={handleReset}
+								disabled={busy}
+							>
+								<svg class="settings-item-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+								</svg>
+								{#if confirmingReset}
+									Tap again to confirm reset
+								{:else}
+									Reset all progress
+								{/if}
+							</button>
+						</div>
+					{/if}
 				</div>
 
 				<SoundToggle />
@@ -223,6 +355,10 @@
 	.nav-chip-streak .chip-icon { width: 0.875rem; height: 0.875rem; color: var(--color-accent); }
 	.nav-chip-spark .chip-value { color: var(--color-accent-dark); }
 
+	.avatar-wrap {
+		position: relative;
+	}
+
 	.nav-avatar {
 		width: 2.125rem;
 		height: 2.125rem;
@@ -232,6 +368,22 @@
 		align-items: center;
 		justify-content: center;
 		box-shadow: 0 2px 6px oklch(44% 0.26 280 / 0.2), 0 0 0 2px oklch(100% 0 0 / 0.5);
+		border: none;
+		cursor: pointer;
+		transition: transform 0.15s var(--ease-smooth), box-shadow 0.15s ease;
+	}
+
+	.nav-avatar:hover {
+		transform: scale(1.08);
+		box-shadow: 0 3px 10px oklch(44% 0.26 280 / 0.3), 0 0 0 2px oklch(100% 0 0 / 0.5);
+	}
+
+	.nav-avatar:active {
+		transform: scale(0.95);
+	}
+
+	.nav-avatar-active {
+		box-shadow: 0 2px 6px oklch(44% 0.26 280 / 0.2), 0 0 0 2.5px var(--color-primary-light);
 	}
 
 	.avatar-letter {
@@ -239,6 +391,154 @@
 		font-size: 0.75rem;
 		font-weight: 800;
 		color: white;
+	}
+
+	/* ── Settings Panel ── */
+	.settings-backdrop {
+		position: fixed;
+		inset: 0;
+		z-index: 49;
+	}
+
+	.settings-panel {
+		position: absolute;
+		top: calc(100% + 0.5rem);
+		right: 0;
+		z-index: 50;
+		width: 16rem;
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-xl);
+		box-shadow: 0 8px 32px oklch(16% 0.02 280 / 0.12), 0 2px 8px oklch(16% 0.02 280 / 0.06);
+		overflow: hidden;
+		animation: settings-in 0.15s var(--ease-out-expo);
+	}
+
+	@keyframes settings-in {
+		from { opacity: 0; transform: translateY(-4px) scale(0.97); }
+		to { opacity: 1; transform: translateY(0) scale(1); }
+	}
+
+	.settings-header {
+		padding: 0.75rem 1rem 0.5rem;
+	}
+
+	.settings-title {
+		font-size: 0.6875rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: var(--color-text-subtle);
+	}
+
+	.settings-item {
+		display: flex;
+		align-items: center;
+		gap: 0.625rem;
+		width: 100%;
+		padding: 0.625rem 1rem;
+		border: none;
+		background: none;
+		font-size: 0.8125rem;
+		font-weight: 600;
+		color: var(--color-text);
+		cursor: pointer;
+		text-align: left;
+		transition: background 0.1s ease;
+	}
+
+	.settings-item:hover {
+		background: var(--color-surface-raised);
+	}
+
+	.settings-item:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+
+	.settings-item-icon {
+		width: 1rem;
+		height: 1rem;
+		color: var(--color-text-muted);
+		flex-shrink: 0;
+	}
+
+	.settings-chevron {
+		width: 0.875rem;
+		height: 0.875rem;
+		color: var(--color-text-muted);
+		margin-left: auto;
+		transition: transform 0.2s var(--ease-smooth);
+	}
+
+	.settings-chevron-open {
+		transform: rotate(180deg);
+	}
+
+	.settings-divider {
+		height: 1px;
+		background: var(--color-border);
+		margin: 0.25rem 0;
+	}
+
+	.settings-item-danger {
+		color: var(--color-error, #dc2626);
+	}
+
+	.settings-item-danger .settings-item-icon {
+		color: var(--color-error, #dc2626);
+	}
+
+	/* ── Jump List ── */
+	.jump-list {
+		max-height: 14rem;
+		overflow-y: auto;
+		padding: 0.25rem 0;
+	}
+
+	.jump-item {
+		display: flex;
+		align-items: center;
+		gap: 0.625rem;
+		width: 100%;
+		padding: 0.5rem 1rem 0.5rem 2.625rem;
+		border: none;
+		background: none;
+		cursor: pointer;
+		text-align: left;
+		transition: background 0.1s ease;
+	}
+
+	.jump-item:hover {
+		background: var(--color-surface-raised);
+	}
+
+	.jump-item:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+
+	.jump-num {
+		width: 1.375rem;
+		height: 1.375rem;
+		border-radius: var(--radius-full);
+		background: var(--color-primary-subtle);
+		color: var(--color-primary);
+		font-size: 0.6875rem;
+		font-weight: 800;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+	}
+
+	.jump-title {
+		font-size: 0.75rem;
+		font-weight: 500;
+		color: var(--color-text-muted);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	/* ── Main ── */

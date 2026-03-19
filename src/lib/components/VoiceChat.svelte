@@ -9,11 +9,15 @@
 	let {
 		lessonId: _lessonId,
 		lessonSlug,
-		onComplete
+		onComplete,
+		heading = 'Ready to Talk?',
+		description = 'Tap below and start talking naturally — just like a real conversation.'
 	}: {
 		lessonId: string;
 		lessonSlug: string;
 		onComplete: (score: number, feedback?: StructuredFeedback) => void;
+		heading?: string;
+		description?: string;
 	} = $props();
 
 	let status = $state<'idle' | 'connecting' | 'active' | 'processing' | 'done' | 'error'>('idle');
@@ -155,9 +159,9 @@
 	}
 </script>
 
-<Card class="flex flex-col gap-5">
+<Card variant="featured" class="flex flex-col gap-5">
 	{#if status === 'idle'}
-		<div class="flex flex-col items-center gap-4 py-6">
+		<div class="flex flex-col items-center gap-4 py-8">
 			<div class="rounded-full bg-primary/10 p-6">
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -174,12 +178,11 @@
 					/>
 				</svg>
 			</div>
-			<h3 class="text-lg font-semibold text-text">Voice Comprehension Check</h3>
+			<h3 class="text-lg font-semibold text-text">{heading}</h3>
 			<p class="max-w-sm text-center text-sm text-text-muted">
-				Have a short conversation with your podcast host to check your understanding.
-				You'll need microphone access.
+				{description}
 			</p>
-			<Button onclick={startConversation} size="lg">Start Conversation</Button>
+			<Button onclick={startConversation} size="lg" variant="cta">Start Talking</Button>
 		</div>
 
 	{:else if status === 'connecting'}
